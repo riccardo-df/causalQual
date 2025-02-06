@@ -1,0 +1,22 @@
+Package: causalQual
+Title: Causal inference with qualitative outcomes
+Version: 0.0.0.9000
+Authors@R: 
+    person("Riccardo", "Di Francesco", , "difrancesco.riccardo96@gmail.com", role = c("aut", "cre"))
+Description: Estimation strategies for causal parameters when the outcome is qualitative (e.g., mltinomial or ordered non-numeric). 'causalQual' implements
+    different estimators for the probability of shift and its conditional versions under selection-on-observables, instrumental
+    variables, difference-in-differences, and regression discontinuity research designs.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    caret,
+    cli,
+    ggplot2,
+    ggsci,
+    grf,
+    magrittr,
+    ocf,
+    stats,
+    stringr
