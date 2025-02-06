@@ -32,7 +32,10 @@
 #'
 #' If \code{outcome_type == "multinomial"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using a \code{\link[ocf]{multinomial_ml}} strategy with regression forests
 #' as base learner. Else, if \code{outcome_type == "ordered"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using the honest version of the \code{\link[ocf]{ocf}} estimator.
-#' \eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. K-fold cross-fitting is employed.
+#' \eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. K-fold cross-fitting is employed.\cr
+#'
+#' Folds are created by random split. If some class of \code{Y} is not observed in one or more folds for one or both treatment groups, a new random partition is performed. This process is repeat until when all
+#' classes are observed in all folds and for all treatment groups up to 1000 times, after which the routine raises an error.
 #'
 #' @import ocf grf
 #' @importFrom caret createFolds
@@ -63,8 +66,15 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
   }
   names(indicators) <- paste0("Class", classes)
 
-  ## 2.) Estimate conditional class probabilities and propensity score via cross-fitting.
+  ## 2.) Estimate conditional class probabilities and propensity score via cross-fitting. Repeat fold splits until all values of outcome are observed in all folds and groups. Stop after 1000 trials.
   folds <- caret::createFolds(seq_len(length(Y)), K, list = TRUE)
+
+  counter <- 1
+  while (any(sapply(folds, function(f) { as.numeric(table(Y[f], D[f])) } ) == 0)) {
+    folds <- caret::createFolds(seq_len(length(Y)), K, list = TRUE)
+    if (counter == 1000) stop("We cannot construct 'K' folds such that all values of 'Y' are observed in all folds. \n Maybe try to reduce 'K'?", call. = FALSE)
+    counter <- counter + 1
+  }
 
   pclasses1 <- matrix(NA, nrow = length(Y), ncol = max(Y))
   pclasses0 <- matrix(NA, nrow = length(Y), ncol = max(Y))
@@ -91,8 +101,14 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
     forest_pscore <- grf::regression_forest(as.matrix(X[train_idx, ]), D[train_idx])
 
     ## Predict on holdout.
-    pclasses1[holdout_idx, ] <- stats::predict(forests1, X[holdout_idx, ])$probabilities
-    pclasses0[holdout_idx, ] <- stats::predict(forests0, X[holdout_idx, ])$probabilities
+    if (outcome_type == "multinomial") {
+      pclasses1[holdout_idx, ] <- stats::predict(forests1, X[holdout_idx, ])
+      pclasses0[holdout_idx, ] <- stats::predict(forests0, X[holdout_idx, ])
+    } else if (outcome_type == "ordered") {
+      pclasses1[holdout_idx, ] <- stats::predict(forests1, X[holdout_idx, ])$probabilities
+      pclasses0[holdout_idx, ] <- stats::predict(forests0, X[holdout_idx, ])$probabilities
+    }
+
     pscore_hat[holdout_idx] <- stats::predict(forest_pscore, as.matrix(X[holdout_idx, ]))$predictions
   }
 

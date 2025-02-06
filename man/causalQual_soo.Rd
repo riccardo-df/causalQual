@@ -45,7 +45,10 @@ The variance of \eqn{\hat{\delta}_m} is estimated as:
 
 If \code{outcome_type == "multinomial"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using a \code{\link[ocf]{multinomial_ml}} strategy with regression forests
 as base learner. Else, if \code{outcome_type == "ordered"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using the honest version of the \code{\link[ocf]{ocf}} estimator.
-\eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. K-fold cross-fitting is employed.
+\eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. K-fold cross-fitting is employed.\cr
+
+Folds are created by random split. If some class of \code{Y} is not observed in one or more folds for one or both treatment groups, a new random partition is performed. This process is repeat until when all
+classes are observed in all folds and for all treatment groups up to 1000 times, after which the routine raises an error.
 }
 \seealso{
 \code{\link{causalQual}}

@@ -37,7 +37,7 @@ If instead \code{outcome_type == "ordered"}, we first generate latent potential 
 
 \deqn{Y_i^* (d) = \tau d + X_{i1} + X_{i2} + X_{i3} + N (0, 1),}
 
-with \eqn{\tau = 2}. We then construct \eqn{Y_i (d)} by discretizing \eqn{Y_i^* (d)} using threshold parameters \eqn{\zeta_1 = -0.5} and \eqn{\zeta_2 = 0.5}. We then have
+with \eqn{\tau = 2}. We then construct \eqn{Y_i (d)} by discretizing \eqn{Y_i^* (d)} using threshold parameters \eqn{\zeta_1 = 2} and \eqn{\zeta_2 = 4}. We then have
 
 \deqn{P(Y_i(d) = m) = P(\zeta_{m-1} < Y_i^*(d) \leq \zeta_m) = \Phi (\zeta_m - \sum_j X_{ij} - \tau d) - \Phi (\zeta_{m-1} - \sum_j X_{ij} - \tau d).}
 
@@ -59,12 +59,12 @@ The function always generates three independent covariates from \eqn{U(0,1)}. Ob
 \donttest{## Generate synthetic data.
 set.seed(1986)
 
-data <- generate_qualitative_data_soo(100, 
+data <- generate_qualitative_data_soo(100,
                                       assignment = "observational",
                                       outcome_type = "ordered")
 
 data$pshifts}
-  
+
 }
 \seealso{
 \code{\link{causalQual}}
