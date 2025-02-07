@@ -72,7 +72,7 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
   counter <- 1
   while (any(sapply(folds, function(f) { as.numeric(table(Y[f], D[f])) } ) == 0)) {
     folds <- caret::createFolds(seq_len(length(Y)), K, list = TRUE)
-    if (counter == 1000) stop("We cannot construct 'K' folds such that all values of 'Y' are observed in all folds. \n Maybe try to reduce 'K'?", call. = FALSE)
+    if (counter == 1000) stop("We cannot construct 'K' folds such that all values of 'Y' are observed in all folds. \nMaybe try with a smaller 'K'?", call. = FALSE)
     counter <- counter + 1
   }
 

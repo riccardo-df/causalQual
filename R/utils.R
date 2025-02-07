@@ -101,7 +101,7 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
     Ystar0 <- rowSums(X) + rnorm(n)
 
     ## Discretize to construct potential outcomes.
-    zeta <- c(2, 4)
+    zeta <- c(2, 3)
 
     Y1 <- cut(Ystar1, breaks = c(-Inf, zeta, Inf), labels = 1:3, right = TRUE)
     Y0 <- cut(Ystar0, breaks = c(-Inf, zeta, Inf), labels = 1:3, right = TRUE)
