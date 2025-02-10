@@ -16,7 +16,9 @@ Imports:
     ggplot2,
     ggsci,
     grf,
+    lmtest,
     magrittr,
     ocf,
+    sandwich,
     stats,
     stringr

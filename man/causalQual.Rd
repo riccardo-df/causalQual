@@ -4,18 +4,31 @@
 \alias{causalQual}
 \title{Causal Inference with Qualitative Outcomes}
 \usage{
-causalQual(Y, D, X, identification, outcome_type, K = 5)
+causalQual(
+  Y = NULL,
+  Y_pre = NULL,
+  Y_post = NULL,
+  D = NULL,
+  X = NULL,
+  identification = NULL,
+  outcome_type = NULL,
+  K = 5
+)
 }
 \arguments{
-\item{Y}{Ordered non-numeric outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.}
+\item{Y}{Qualitative outcome. Must be labeled as \eqn{\{1, 2, \dots\}}. Ignored if \code{outcome_type == "diff_in_diff"}.}
+
+\item{Y_pre}{Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}. Ignored if \code{outcome_type != "diff_in_diff"}.}
+
+\item{Y_post}{Qualitative outcome after treatment. Must be labeled as \eqn{\{1, 2, \dots\}}. Ignored if \code{outcome_type != "diff_in_diff"}.}
 
 \item{D}{Binary treatment indicator.}
 
-\item{X}{Covariate matrix (no intercept).}
+\item{X}{Covariate matrix (no intercept). Ignored if \code{outcome_type == "diff_in_diff"}.}
 
-\item{identification}{String controlling the employed identification strategy. Must be one of \code{"selection_on_observables"}.}
+\item{identification}{String controlling the employed identification strategy. Must be one of \code{"selection_on_observables"}, \code{"diff_in_diff"}.}
 
-\item{outcome_type}{String controlling the outcome type. Must be either \code{"multinomial"} or \code{"ordered"}. Affects estimation of conditional class probabilities.}
+\item{outcome_type}{String controlling the outcome type. Must be either \code{"multinomial"} or \code{"ordered"}. Affects estimation of conditional class probabilities. Ignored if \code{identification != "selection_on_observables"}.}
 
 \item{K}{Number of folds for nuisance functions estimation. Ignored if \code{identification != "selection_on_observables"}.}
 }
@@ -26,13 +39,12 @@ An object of class \code{\link{causalQual}}.
 Estimates treatment effects on qualitative outcomes (e.g., multinomial or ordered non-numeric) under several research designs.
 }
 \details{
-Depending on \code{identification}, \code{\link{causalQual}} calls the appropriate estimation function.
 \subsection{Selection-on-observables}{
 
-Under selection-on-observables, identification requires the treatment indicator to be (conditionally) independent of potential outcomes
-(unconfoundedness), and that each unit has a non-zero probability of being treated (common support).\cr
+Under a selection-on-observables design, identification requires the treatment indicator to be (conditionally) independent of potential outcomes
+(unconfoundedness), and that each unit has a non-zero probability of being treated (common support). If these hold, we can recover the probabilities of shift of all classes.\cr
 
-If \code{identification == "selection_on_observables"}, \code{\link{causalQual}} constructs and averages doubly robust scores for ordinal outcomes
+If \code{identification == "selection_on_observables"}, \code{\link{causalQual}} constructs and averages doubly robust scores for qualitative outcomes
 to estimate the probability shifts \eqn{\delta_m := P(Y(1) = m) - P(Y(0) = m)}. For each class \eqn{m}, the doubly robust score is defined as:
 \deqn{
     \hat{\Gamma}_{m, i} =
@@ -52,30 +64,57 @@ The variance of \eqn{\hat{\delta}_m} is estimated as:
 }
 
 If \code{outcome_type == "multinomial"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using a \code{\link[ocf]{multinomial_ml}} strategy with regression forests
-as base learner. Else, if \code{outcome_type == "ordered"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using the honest version of the \code{\link[ocf]{ocf}} estimator.
+as base learners. Else, if \code{outcome_type == "ordered"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using the honest version of the \code{\link[ocf]{ocf}} estimator.
 \eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. K-fold cross-fitting is employed.
+}
+
+\subsection{Difference-in-differences}{
+
+Under a difference-in-difference design, identification requires that the probabilities time shift for class \eqn{m} evolve similarly for the treated and control groups  (parallel
+trends on the probability mass functions of \code{Y}). If this holds, we can recover the probability of shift on the treated for class \eqn{m}.\cr
+
+If \code{identification == "selection_on_observables"}, \code{\link{causalQual}} fits one linear model for each class \eqn{m} of \code{Y}. Each model uses a binary indicator \eqn{1(Y_{it} = m)} as an outcome and a
+time dummy, a treatment dummy (\code{D}), and an interaction thereof as regressors. The coefficient on the interaction identifies the probability of shift on the treated for class \eqn{m}. Standard errors are clustered
+at the unit level.
 }
 }
 \examples{
-\donttest{## Generate synthetic data.
+\donttest{## Selection-on-observables.
+# Generate synthetic data.
 set.seed(1986)
 
-data <- generate_qualitative_data_soo(100, assignment = "observational")
+data <- generate_qualitative_data_soo(1000, assignment = "observational",
+                                      outcome_type = "ordered")
 Y <- data$Y
 D <- data$D
 X <- data$X
 
-## Estimate probability shifts.
-fit <- causalQual(Y, D, X, 
+# Estimate probabilities of shift.
+fit <- causalQual(Y = Y, D = D, X = X,
                   identification = "selection_on_observables",
                   outcome_type = "ordered")
 
 summary(fit)
+plot(fit)
+
+## Difference-in-differences.
+# Generate synthetic data.
+set.seed(1986)
+
+data <- generate_qualitative_data_did(1000, assignment = "observational",
+                                      outcome_type = "ordered")
+Y_pre <- data$Y_pre
+Y_post <- data$Y_post
+D <- data$D
+
+# Estimate probabilities of shift on the treated.
+fit <- causalQual(Y_pre = Y_pre, Y_post = Y_post, D = D,
+                  identification = "diff_in_diff",
+                  outcome_type = "ordered")
+
+summary(fit)
 plot(fit)}
-  
-}
-\seealso{
-\code{\link{causalQual_soo}}
+
 }
 \author{
 Riccardo Di Francesco

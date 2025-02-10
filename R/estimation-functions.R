@@ -1,18 +1,18 @@
 #' Double Machine Learning for Qualitative Outcomes
 #'
-#' Construct and average doubly robust scores for qualitative outcomes to estimate the probability shifts. Identification requires the treatment indicator to be (conditionally) independent of potential outcomes
+#' Construct and average doubly robust scores for qualitative outcomes to estimate the probabilities of shift. Identification requires the treatment indicator to be (conditionally) independent of potential outcomes
 #' (unconfoundedness), and that each unit has a non-zero probability of being treated (common support).
 #'
-#' @param Y Ordered non-numeric outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.
+#' @param Y Qualitative outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.
 #' @param D Binary treatment indicator.
 #' @param X Covariate matrix (no intercept).
 #' @param outcome_type String controlling the outcome type. Must be either \code{"multinomial"} or \code{"ordered"}. Affects estimation of conditional class probabilities.
 #' @param K Number of folds for nuisance functions estimation.
 #'
-#' @return An object of class \code{causalQual}.
+#' @return A list with estimates, standard errors, and doubly-robust scores.
 #'
 #' @details
-#' For each class \eqn{m}, the doubly robust score is defined as:
+#' For each class \eqn{m} of \code{Y}, the doubly robust score is defined as:
 #' \deqn{
 #'     \hat{\Gamma}_{m, i} =
 #'     \hat{P}(Y = m \mid D = 1, X_i) - \hat{P}(Y = m \mid D = 0, X_i) +
@@ -48,10 +48,9 @@
 #' @keywords internal
 causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
   ## 0.) Handling inputs and checks.
-  if (!all(sort(unique(Y)) == seq_len(max(Y)))) stop("Invalid 'Y'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
-  if (any(!(D %in% c(0, 1)))) stop("Invalid 'D'. Treatment must be binary {0, 1}.", call. = FALSE)
   if (K < 1 | K %% 1 != 0) stop("Invalid 'K'. Number of folds must be a positive integer.", call. = FALSE)
   if (!(outcome_type %in% c("multinomial", "ordered"))) stop("Invalid 'outcome_type'. Must be either 'multinomial' or 'ordered'.", call. = FALSE)
+  if (!all(sort(unique(Y)) == seq_len(max(Y)))) stop("Invalid 'Y'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
 
   classes <- sort(unique(Y))
   treated_idx <- which(D == 1)
@@ -121,14 +120,75 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
   }
   names(gammas) <- paste0("Class", sort(unique(Y)))
 
-  ## 4.) Pick mean and standard deviation of doubly-robust scores. Then construct confidence intervals.
+  ## 4.) Pick mean and standard deviation of doubly-robust scores.
   pshifts_hat <- sapply(gammas, mean)
   pshifts_hat_se <- sapply(seq_along(gammas), function(m) mean((gammas[[m]] - pshifts_hat[m])^2) / length(Y)) %>%
     sqrt()
 
-  ci_lower <- pshifts_hat - 1.96 * pshifts_hat_se
-  ci_upper <- pshifts_hat + 1.96 * pshifts_hat_se
-
   ## 5.) Output.
-  return(list("estimates" = pshifts_hat, "standard_errors" = pshifts_hat_se, "ci_lower" = ci_lower, "ci_upper" = ci_upper))
+  return(list("estimates" = list("pshifts" = pshifts_hat), "standard_errors" = list("pshifts" = pshifts_hat_se), "dr_scores" = gammas))
+}
+
+
+#' Two-Way Fixed Effects Models for Qualitative Outcomes
+#'
+#' Fit two-way fixed-effect models for qualitative outcomes to estimate the probabilities of shift on the treated. Identification requires that the probability time shifts follow
+#' a similar evolution over time in both the treated and control groups (parallel trends on the mass functions).
+#'
+#' @param Y_pre Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
+#' @param Y_post Qualitative outcome after treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
+#' @param D Binary treatment indicator.
+#'
+#' @return A list with estimates, standard errors, and model fit information.
+#'
+#' @details
+#' This function fits one linear model for each class \eqn{m} of \code{Y}. Each model uses a binary indicator \code{Y == m} as an outcome and a time dummy, a treatment dummy (\code{D}), and an interaction thereof
+#' as regressors. Standard errors are clustered at the unit level.
+#'
+#' @importFrom lmtest coeftest
+#' @importFrom sandwich vcovCL
+#' @importFrom stats lm
+#' @importFrom stats as.formula pnorm
+#'
+#' @author Your Name
+#' @export
+causalQual_did <- function(Y_pre, Y_post, D) {
+  ## 0.) Handle inputs and checks.
+  if (!all(sort(unique(Y_pre)) == seq_len(max(Y_pre)))) stop("Invalid 'Y_pre'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
+  if (!all(sort(unique(Y_post)) == seq_len(max(Y_post)))) stop("Invalid 'Y_post'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
+
+  classes_pre <- sort(unique(Y_pre))
+  classes_post <- sort(unique(Y_post))
+
+  if (any(sort(unique(classes_pre) != sort(unique(classes_post))))) stop("'Y_pre' and 'Y_post' have different classes.", call. = FALSE)
+  classes <- classes_pre
+
+  Y <- c(Y_pre, Y_post)
+  D_new <- c(rep(D, 2))
+  time <- c(rep(0, length(Y_pre)), rep(1, length(Y_pre)))
+  unit_id <- rep(seq_len(length(Y_pre)), 2)
+
+  data <- data.frame("Y" = Y, "D" = D_new, "time" = time, "unit_id" = unit_id)
+
+  ## 1.) Fit models.
+  formula_str <- "D*time "
+
+  fits <- list()
+  pshifts_treated_hat <- numeric()
+  pshifts_treated_hat_se <- numeric()
+
+  classes <- sort(unique(Y))
+
+  for (m in classes) {
+    data$indicator <- as.numeric(Y == m)
+    fit <- stats::lm(stats::as.formula(paste0("indicator ~ ", formula_str)), data = data)
+    cluster_se <- lmtest::coeftest(fit, vcov = sandwich::vcovCL(fit, cluster = ~ unit_id, type = "HC0"))
+
+    fits[[paste0("Class_", m)]] <- fit
+    pshifts_treated_hat[m] <- coef(fit)["D:time"]
+    pshifts_treated_hat_se[m] <- cluster_se["D:time", 2]
+  }
+
+  ## 2.) Output.
+  return(list("estimates" = list("pshifts_treated" = pshifts_treated_hat), "standard_errors" = list("pshifts_treated" = pshifts_treated_hat_se), "fits" = fits))
 }

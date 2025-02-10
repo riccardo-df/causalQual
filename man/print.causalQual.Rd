@@ -21,13 +21,14 @@ Prints an \code{causalQual} object.
 \donttest{## Generate synthetic data.
 set.seed(1986)
 
-data <- generate_qualitative_data_soo(1000, assignment = "observational")
+data <- generate_qualitative_data_soo(1000, assignment = "observational",
+                                      outcome_type = "ordered")
 Y <- data$Y
 D <- data$D
 X <- data$X
 
-## Estimate probability shifts.
-fit <- causalQual(Y, D, X, 
+## Estimate probabilities of shifts.
+fit <- causalQual(Y = Y, D = D, X = X,
                   identification = "selection_on_observables",
                   outcome_type = "ordered")
 print(fit)}

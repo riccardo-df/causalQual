@@ -7,7 +7,7 @@
 causalQual_soo(Y, D, X, outcome_type, K = 5)
 }
 \arguments{
-\item{Y}{Ordered non-numeric outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.}
+\item{Y}{Qualitative outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.}
 
 \item{D}{Binary treatment indicator.}
 
@@ -18,14 +18,14 @@ causalQual_soo(Y, D, X, outcome_type, K = 5)
 \item{K}{Number of folds for nuisance functions estimation.}
 }
 \value{
-An object of class \code{causalQual}.
+A list with estimates, standard errors, and doubly-robust scores.
 }
 \description{
-Construct and average doubly robust scores for qualitative outcomes to estimate the probability shifts. Identification requires the treatment indicator to be (conditionally) independent of potential outcomes
+Construct and average doubly robust scores for qualitative outcomes to estimate the probabilities of shift. Identification requires the treatment indicator to be (conditionally) independent of potential outcomes
 (unconfoundedness), and that each unit has a non-zero probability of being treated (common support).
 }
 \details{
-For each class \eqn{m}, the doubly robust score is defined as:
+For each class \eqn{m} of \code{Y}, the doubly robust score is defined as:
 \deqn{
     \hat{\Gamma}_{m, i} =
     \hat{P}(Y = m \mid D = 1, X_i) - \hat{P}(Y = m \mid D = 0, X_i) +

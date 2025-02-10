@@ -1,52 +1,69 @@
 #' Summary Method for causalQual Objects
-#' 
+#'
 #' Summarizes an \code{\link{causalQual}} object.
-#' 
+#'
 #' @param object An \code{\link{causalQual}} object.
 #' @param ... Further arguments passed to or from other methods.
-#' 
-#' @return 
+#'
+#' @return
 #' Summarizes an \code{\link{causalQual}} object.
-#' 
-#' @examples 
+#'
+#' @examples
 #' \donttest{## Generate synthetic data.
 #' set.seed(1986)
-#' 
-#' data <- generate_qualitative_data_soo(1000, assignment = "observational")
+#'
+#' data <- generate_qualitative_data_soo(1000, assignment = "observational",
+#'                                       outcome_type = "ordered")
 #' Y <- data$Y
 #' D <- data$D
 #' X <- data$X
-#' 
-#' ## Estimate probability shifts.
-#' fit <- causalQual(Y, D, X, 
+#'
+#' ## Estimate probabilities of shifts.
+#' fit <- causalQual(Y = Y, D = D, X = X,
 #'                   identification = "selection_on_observables",
 #'                   outcome_type = "ordered")
 #' summary(fit)}
-#' 
+#'
 #' @import cli
-#' 
+#'
 #' @author Riccardo Di Francesco
 #'
 #' @seealso \code{\link{causalQual}}
-#' 
+#'
 #' @export
 summary.causalQual <- function(object, ...) {
+  if (object$identification == "selection_on_observables") {
+    estimand <- "probability_shifts"
+  } else if (object$identification == "diff_in_diff") {
+    estimand <- "probability_shifts_on_treated"
+  }
+
   cli::cli_h1("CAUSAL INFERENCE WITH QUALITATIVE OUTCOMES")
   cli::cli_h2("Research design")
   cat("Identification:         ", object$identification, "\n")
+  cat("Estimand:               ", estimand, "\n")
   cat("Outcome type:           ", object$outcome_type, "\n")
-  cat("Full sample size:       ", dim(object$data)[1], "\n")
-  cat("N. covariates:          ", dim(object$data)[2] - 2, "\n")
-  cat("Classes:                ", sort(unique(object$data$Y)), "\n")
+  cat("Classes:                ", if (object$identification == "diff_in_diff") sort(unique(object$data$Y_pre)) else sort(unique(object$data$Y)), "\n")
+  cat("N. units:               ", length(object$data$D), "\n")
   cat("Fraction treated units: ", mean(object$data$D), "\n\n")
+
   cli::cli_h2("Point estimates and 95\\% confidence intervals")
-  estimates <- object$estimates
+  if (object$identification == "selection_on_observables") {
+    estimates <- object$estimates$pshifts
+    standard_errors <- object$standard_errors$pshifts
+  } else if (object$identification == "diff_in_diff") {
+    estimates <- object$estimates$pshifts_treated
+    standard_errors <- object$standard_errors$pshifts_treated
+  }
+
+  ci_lower <- format(round(standard_errors - 1.96 * standard_errors, 3), nsmall = 3)
+  ci_upper <- format(round(standard_errors + 1.96 * standard_errors, 3), nsmall = 3)
+
   estimates <- format(round(estimates, 3), nsmall = 3)
-  
-  ci_lower <- format(round(object$ci_lower, 3), nsmall = 3)
-  ci_upper <- format(round(object$ci_upper, 3), nsmall = 3)
+  standard_errors <- format(round(standard_errors, 3), nsmall = 3)
+
   formatted_cis <- paste0("[", ci_lower, ", ", ci_upper, "]")
-  
+
   for (i in seq_along(estimates)) {
     cat(paste0("Class ", i, ": ", estimates[i], "  ", formatted_cis[i], "\n"))
   }
@@ -59,29 +76,30 @@ summary.causalQual <- function(object, ...) {
 #'
 #' @param x An \code{causalQual} object.
 #' @param ... Further arguments passed to or from other methods.
-#' 
-#' @return 
+#'
+#' @return
 #' Prints an \code{causalQual} object.
-#' 
-#' @examples 
+#'
+#' @examples
 #' \donttest{## Generate synthetic data.
 #' set.seed(1986)
-#' 
-#' data <- generate_qualitative_data_soo(1000, assignment = "observational")
+#'
+#' data <- generate_qualitative_data_soo(1000, assignment = "observational",
+#'                                       outcome_type = "ordered")
 #' Y <- data$Y
 #' D <- data$D
 #' X <- data$X
-#' 
-#' ## Estimate probability shifts.
-#' fit <- causalQual(Y, D, X, 
+#'
+#' ## Estimate probabilities of shifts.
+#' fit <- causalQual(Y = Y, D = D, X = X,
 #'                   identification = "selection_on_observables",
 #'                   outcome_type = "ordered")
 #' print(fit)}
-#' 
+#'
 #' @author Riccardo Di Francesco
 #'
 #' @seealso \code{\link{causalQual}}
-#' 
+#'
 #' @export
 print.causalQual <- function(x, ...) {
   summary.causalQual(x, ...)
@@ -101,47 +119,48 @@ print.causalQual <- function(x, ...) {
 #'
 #' \donttest{## Generate synthetic data.
 #' set.seed(1986)
-#' 
-#' data <- generate_qualitative_data_soo(1000, assignment = "observational")
+#'
+#' data <- generate_qualitative_data_soo(1000, assignment = "observational",
+#'                                       outcome_type = "ordered")
 #' Y <- data$Y
 #' D <- data$D
 #' X <- data$X
-#' 
-#' ## Estimate probability shifts.
-#' fit <- causalQual(Y, D, X, 
+#'
+#' ## Estimate probabilities of shifts.
+#' fit <- causalQual(Y = Y, D = D, X = X,
 #'                   identification = "selection_on_observables",
 #'                   outcome_type = "ordered")
 #' plot(fit)}
-#' 
+#'
 #' @import ggplot2 ggsci
 #' @importFrom stats coef
 #'
 #' @author Riccardo Di Francesco
 #'
 #' @seealso \code{\link{causalQual}}
-#' 
+#'
 #' @export
 plot.causalQual <- function(x, hline = TRUE, ...) {
   ## 0.) Handle input and checks.
   if (!is.logical(hline)) stop("Invalid 'hline'. Must be logical.", call. = FALSE)
-  
+
   estimate <- NULL
   ci_lower <- NULL
   ci_upper <- NULL
-  
+
   ## 1.) Prepare data for plot.
-  plot_data <- data.frame(class = factor(seq_along(x$estimates), labels = paste0("Class ", seq_along(x$estimates))),
-                          estimate = x$estimates,
-                          ci_lower = x$ci_lower,
-                          ci_upper = x$ci_upper)
-  
+  plot_data <- data.frame(class = factor(seq_along(x$estimates[[1]]), labels = paste0("Class ", seq_along(x$estimates[[1]]))),
+                          estimate = x$estimates[[1]],
+                          ci_lower = x$estimates[[1]] - 1.96 * x$standard_errors[[1]],
+                          ci_upper = x$estimates[[1]] + 1.96 * x$standard_errors[[1]])
+
   ## 2.) Construct plot.
   plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = class, y = estimate)) +
-    ggplot2::geom_point(size = 2, color = "#1F78B4") +  
+    ggplot2::geom_point(size = 2, color = "#1F78B4") +
     ggplot2::geom_errorbar(ggplot2::aes(ymin = ci_lower, ymax = ci_upper), width = 0.2, color = "#1F78B4") +
     ggplot2::geom_hline(yintercept = if (hline) 0 else NULL, linetype = "dashed") +
     ggplot2::labs(x = "", y = "") +
-    ggplot2::theme_bw(base_size = 14) +  
+    ggplot2::theme_bw(base_size = 14) +
     ggplot2::theme(axis.text = ggplot2::element_text(size = 12))
 
   ## 3.) Plot
