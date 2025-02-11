@@ -10,6 +10,7 @@ causalQual(
   Y_post = NULL,
   D = NULL,
   X = NULL,
+  Z = NULL,
   identification = NULL,
   outcome_type = NULL,
   K = 5
@@ -24,9 +25,11 @@ causalQual(
 
 \item{D}{Binary treatment indicator.}
 
-\item{X}{Covariate matrix (no intercept). Ignored if \code{outcome_type == "diff_in_diff"}.}
+\item{X}{Covariate matrix (no intercept). Ignored if \code{outcome_type != "selection_on_observables"}.}
 
-\item{identification}{String controlling the employed identification strategy. Must be one of \code{"selection_on_observables"}, \code{"diff_in_diff"}.}
+\item{Z}{Binary instrument. Ignored if \code{identification != "iv"}.}
+
+\item{identification}{String controlling the employed identification strategy. Must be one of \code{"selection_on_observables"}, \code{"iv"}, \code{"diff_in_diff"}.}
 
 \item{outcome_type}{String controlling the outcome type. Must be either \code{"multinomial"} or \code{"ordered"}. Affects estimation of conditional class probabilities. Ignored if \code{identification != "selection_on_observables"}.}
 
@@ -68,6 +71,15 @@ as base learners. Else, if \code{outcome_type == "ordered"}, \eqn{\hat{P}(Y = m 
 \eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. K-fold cross-fitting is employed.
 }
 
+\subsection{Instrumental-variables}{
+
+Under an instrumental-variables design, identification requires the treatment assignment (i.e., the instrument) to be independent of potential outcomes and potential treatments (exogeneity), that the
+instrument influences the outcome solely through its effect on treatment (exclusion restriction), that the instrument has a nonzero effect on treatment probability (relevance), and that the instrument can only
+increase/decrease the treatment probability (monotonicity). If these hold, we can recover the local probabilities of shift of all classes.\cr
+
+If \code{identification == "iv"}, \code{\link{causalQual}} fits one standard two-stage least squares model for each class \eqn{m} of \code{Y}. Each model uses a binary indicator \eqn{1(Y_{it} = m)} as an outcome.
+}
+
 \subsection{Difference-in-differences}{
 
 Under a difference-in-difference design, identification requires that the probabilities time shift for class \eqn{m} evolve similarly for the treated and control groups  (parallel
@@ -92,6 +104,24 @@ X <- data$X
 # Estimate probabilities of shift.
 fit <- causalQual(Y = Y, D = D, X = X,
                   identification = "selection_on_observables",
+                  outcome_type = "ordered", K = 2)
+
+summary(fit)
+plot(fit)
+
+## Instrumental variables.
+# Generate synthetic data.
+set.seed(1986)
+
+data <- generate_qualitative_data_iv(1000,
+                                     outcome_type = "ordered")
+Y <- data$Y
+D <- data$D
+Z <- data$Z
+
+# Estimate local probabilities of shift.
+fit <- causalQual(Y = Y, D = D, Z = Z,
+                  identification = "iv",
                   outcome_type = "ordered")
 
 summary(fit)

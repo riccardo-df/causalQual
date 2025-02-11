@@ -130,6 +130,52 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
 }
 
 
+#' Two-Stage Least Squares for Qualitative Outcomes
+#'
+#' Fit two-stage least squares models for qualitative outcomes to estimate the local probabilities of shift. Identification requires the instrument to be independent of potential outcomes and
+#' potential treatments (exogeneity) and not to have any direct effect on potential outcomes (exclusion restriction). The instrument must also have a non-zero impact on treatment probability
+#' (relevance) and to only increase/decrease that probability (monotonicity).
+#'
+#' @param Y Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
+#' @param D Binary treatment indicator.
+#' @param Z Binary instrument.
+#'
+#' @return A list with estimates, standard errors, and model fit information.
+#'
+#' @details
+#' This function fits one two-stage least squares model for each class \eqn{m} of \code{Y}. Each model uses a binary indicator \code{Y == m} as an outcome.
+#'
+#' @importFrom AER ivreg
+#'
+#' @author Riccardo Di Francesco
+#' @export
+causalQual_iv <- function(Y, D, Z) {
+  ## 0.) Handle inputs and checks.
+  if (any(!(Z %in% c(0, 1)))) stop("Invalid 'Z'. Instrument must be binary {0, 1}.", call. = FALSE)
+  if (!all(sort(unique(Y)) == seq_len(max(Y)))) stop("Invalid 'Y'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
+
+  classes <- sort(unique(Y))
+  data <- data.frame("Y" = Y, "D" = D, "Z" = Z)
+
+  ## 1.) Fit models.
+  fits <- list()
+  local_pshifts_hat <- numeric()
+  local_pshifts_hat_se <- numeric()
+
+  for (m in classes) {
+    data$indicator <- as.numeric(Y == m)
+    fit <- AER::ivreg(indicator ~ D | Z, data = data)
+
+    fits[[paste0("Class_", m)]] <- fit
+    local_pshifts_hat[m] <- coef(fit)["D"]
+    local_pshifts_hat_se[m] <-  summary(fit)$coefficients["D", 2]
+  }
+
+  ## 2.) Output.
+  return(list("estimates" = list("local_pshifts" = local_pshifts_hat), "standard_errors" = list("local_pshifts" = local_pshifts_hat_se), "fits" = fits))
+}
+
+
 #' Two-Way Fixed Effects Models for Qualitative Outcomes
 #'
 #' Fit two-way fixed-effect models for qualitative outcomes to estimate the probabilities of shift on the treated. Identification requires that the probability time shifts follow
@@ -150,12 +196,14 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
 #' @importFrom stats lm
 #' @importFrom stats as.formula pnorm
 #'
-#' @author Your Name
+#' @author Riccardo Di Francesco
+#'
 #' @export
 causalQual_did <- function(Y_pre, Y_post, D) {
   ## 0.) Handle inputs and checks.
   if (!all(sort(unique(Y_pre)) == seq_len(max(Y_pre)))) stop("Invalid 'Y_pre'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
   if (!all(sort(unique(Y_post)) == seq_len(max(Y_post)))) stop("Invalid 'Y_post'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
+  if (is.null(Y_pre) | is.null(Y_post)) stop("When 'identification' is 'diff_in_diff', we need both 'Y_pre' and 'Y_post'.", call. = FALSE)
 
   classes_pre <- sort(unique(Y_pre))
   classes_post <- sort(unique(Y_post))
@@ -171,17 +219,13 @@ causalQual_did <- function(Y_pre, Y_post, D) {
   data <- data.frame("Y" = Y, "D" = D_new, "time" = time, "unit_id" = unit_id)
 
   ## 1.) Fit models.
-  formula_str <- "D*time "
-
   fits <- list()
   pshifts_treated_hat <- numeric()
   pshifts_treated_hat_se <- numeric()
 
-  classes <- sort(unique(Y))
-
   for (m in classes) {
     data$indicator <- as.numeric(Y == m)
-    fit <- stats::lm(stats::as.formula(paste0("indicator ~ ", formula_str)), data = data)
+    fit <- stats::lm(indicator ~ D*time, data = data)
     cluster_se <- lmtest::coeftest(fit, vcov = sandwich::vcovCL(fit, cluster = ~ unit_id, type = "HC0"))
 
     fits[[paste0("Class_", m)]] <- fit

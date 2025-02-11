@@ -48,8 +48,8 @@ which allows us to analytically compute the probabilities of shift.
 
 \subsection{Treatment assignment}{
 
-Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = (X_{i1} + X_{i2}) / 2}.
-If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = 0.5}.
+Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
+If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i2}) / 2}.
 }
 
 \subsection{Other details}{

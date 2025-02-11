@@ -25,5 +25,5 @@ This function fits one linear model for each class \eqn{m} of \code{Y}. Each mod
 as regressors. Standard errors are clustered at the unit level.
 }
 \author{
-Your Name
+Riccardo Di Francesco
 }

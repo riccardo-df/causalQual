@@ -33,14 +33,19 @@
 #' @export
 summary.causalQual <- function(object, ...) {
   if (object$identification == "selection_on_observables") {
-    estimand <- "probability_shifts"
+    identification <- "Selection-on-Observables"
+    estimand <- "Probability shifts"
+  } else if (object$identification == "iv") {
+    identification <- "Instrumental Variables"
+    estimand <- "Local Probability Shifts"
   } else if (object$identification == "diff_in_diff") {
-    estimand <- "probability_shifts_on_treated"
+    identification <- "Difference-in-Differences"
+    estimand <- "Probability Shifts on the Treated"
   }
 
   cli::cli_h1("CAUSAL INFERENCE WITH QUALITATIVE OUTCOMES")
   cli::cli_h2("Research design")
-  cat("Identification:         ", object$identification, "\n")
+  cat("Identification:         ", identification, "\n")
   cat("Estimand:               ", estimand, "\n")
   cat("Outcome type:           ", object$outcome_type, "\n")
   cat("Classes:                ", if (object$identification == "diff_in_diff") sort(unique(object$data$Y_pre)) else sort(unique(object$data$Y)), "\n")
@@ -51,6 +56,9 @@ summary.causalQual <- function(object, ...) {
   if (object$identification == "selection_on_observables") {
     estimates <- object$estimates$pshifts
     standard_errors <- object$standard_errors$pshifts
+  } else if (object$identification == "iv") {
+    estimates <- object$estimates$local_pshifts
+    standard_errors <- object$standard_errors$local_pshifts
   } else if (object$identification == "diff_in_diff") {
     estimates <- object$estimates$pshifts_treated
     standard_errors <- object$standard_errors$pshifts_treated

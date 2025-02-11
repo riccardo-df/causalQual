@@ -42,8 +42,8 @@
 #' which allows us to analytically compute the probabilities of shift.
 #'
 #' ## Treatment assignment
-#' Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = (X_{i1} + X_{i2}) / 2}.
-#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = 0.5}.
+#' Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
+#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i2}) / 2}.
 #'
 #' ## Other details
 #' The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.
@@ -94,7 +94,7 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
   } else if (outcome_type == "ordered") {
     ## Generate latent potential outcomes with ATE tau.
     tau <- 2
-    Ystar1 <- tau + rowSums(X) + rnorm(n) # Essentially, coefficients set to 1.
+    Ystar1 <- tau + rowSums(X) + rnorm(n)
     Ystar0 <- rowSums(X) + rnorm(n)
 
     ## Discretize to construct potential outcomes.
@@ -114,8 +114,6 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
     pmass0 <- cbind(pnorm(zeta[1] - rowSums(X)),
                     pnorm(zeta[2] - rowSums(X)) - pnorm(zeta[1] - rowSums(X)),
                     1 - pnorm(zeta[2] - rowSums(X)))
-
-    pshifts <- colMeans(pmass1 - pmass0)
   }
 
   ## 3.) Define propensity scores and assign treatment.
@@ -134,12 +132,142 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
   pshifts <- colMeans(pmass1 - pmass0)
 
   ## 6.) Output.
+  return(list("Y" = Y, "D" = D, "X" = X, "pscore" = pscore, "pshifts" = pshifts))
+}
+
+
+#' Generate Qualitative Data (Instrumental Variables)
+#'
+#' Generate a synthetic data set with qualitative outcomes for an instrumental-variables setting. The data include a binary treatment indicator and a binary treatment assignment (the instrument). Potential outcomes
+#' and potential treatments are independent of the instrument. Moreover, the instrument does not directly impact potential outcomes, has an impact on treatment probability, and can only increase the probability
+#' of treatment.
+#'
+#' @param n Sample size.
+#' @param outcome_type String controlling the outcome type. Must be either \code{"multinomial"} or \code{"ordered"}. Affects how potential outcomes are generated.
+#'
+#' @return A list storing a data frame with the observed data, the true propensity score, the true instrument propensity score, and the true local probabilities of shift.
+#'
+#' @examples
+#' \donttest{## Generate synthetic data.
+#' set.seed(1986)
+#'
+#' data <- generate_qualitative_data_iv(100,
+#'                                      outcome_type = "ordered")
+#'
+#' data$local_pshifts}
+#'
+#' @details
+#' ## Outcome type
+#' Potential outcomes are generated differently according to \code{outcome_type}. If \code{outcome_type == "multinomial"}, the function computes linear predictors for each class using the covariates:
+#'
+#' \deqn{\eta_{mi} (d) = \beta_{m1}^d X_{i1} + \beta_{m2}^d X_{i2} + \beta_{m3}^d X_{i3},}
+#'
+#' and then transforms \eqn{\eta_{mi} (d)} into valid probability distributions using the softmax function:
+#'
+#' \deqn{P(Y(d) = m \mid X) = \frac{\exp(\eta_{mi (d)})}{\sum_{m'} \exp(\eta_{m'i(d)})}.}
+#'
+#' It then generates potential outcomes \eqn{Y(1)} and \eqn{Y(0)} by sampling from \{1, 2, 3\} using \eqn{P(Y(d) = m \mid X)}.\cr
+#'
+#' If instead \code{outcome_type == "ordered"}, we first generate latent potential outcomes:
+#'
+#' \deqn{Y_i^* (d) = \tau d + X_{i1} + X_{i2} + X_{i3} + N (0, 1),}
+#'
+#' with \eqn{\tau = 2}. We then construct \eqn{Y_i (d)} by discretizing \eqn{Y_i^* (d)} using threshold parameters \eqn{\zeta_1 = 2} and \eqn{\zeta_2 = 4}. We then have
+#'
+#' \deqn{P(Y_i(d) = m) = P(\zeta_{m-1} < Y_i^*(d) \leq \zeta_m) = \Phi (\zeta_m - \sum_j X_{ij} - \tau d) - \Phi (\zeta_{m-1} - \sum_j X_{ij} - \tau d).}
+#'
+#' which allows us to analytically compute the probabilities of shift.
+#'
+#' ## Treatment assignment
+#' Treatment is always assigned as \eqn{Z_i \sim \text{Bernoulli}(0.5)}. Treatment intake is always modeled as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}, with
+#' \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = (X_{i1} + X_{i2} + Z_i) / 3}. Thus, \eqn{Z_i} can increase the probability of treatment intake but cannot decrease it.
+#'
+#' ## Other details
+#' The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.
+#'
+#' @importFrom stats rbinom
+#' @importFrom stats runif
+#'
+#' @author Riccardo Di Francesco
+#'
+#' @seealso \code{\link{causalQual}}
+#'
+#' @export
+generate_qualitative_data_iv <- function(n, outcome_type) {
+  ## 0.) Handling inputs and checks.
+  if (n < 1 | n %% 1 != 0) stop("Invalid 'n'. This must be an integer greater than or equal to one.", call. = FALSE)
+  if (!(outcome_type %in% c("multinomial", "ordered"))) stop("Invalid 'outcome_type'. Must be either 'multinomial' or 'ordered'.", call. = FALSE)
+
+  k <- 3
+  classes <- seq_len(3)
+
+  ## 1.) Generate covariates.
+  X <- matrix(runif(n * k), ncol = k)
+  colnames(X) <- paste0("X", seq(k))
+
+  ## 2.) Construct potential outcomes-
   if (outcome_type == "multinomial") {
-    pshifts <- colMeans(pmass1 - pmass0)
+    ## Construct linear predictors.
+    beta1 <- matrix(c(0.5,  0.3, -0.2, # Class 1.
+                      -0.2,  0.4,  0.1, # Class 2.
+                      0.1, -0.3, 0.5), # Class 3.
+                    ncol = 3, byrow = TRUE)
+    beta0 <- matrix(c(0.7,  0.7, -0.2, # Class 1.
+                      -0.2,  0.4,  0.1, # Class 2.
+                      -0.2, -0.5,  0.1), # Class 3.
+                    ncol = 3, byrow = TRUE)
+
+    logits1 <- X %*% beta1
+    logits0 <- X %*% beta0
+
+    ## Softmax function to get valid probabilities.
+    pmass1 <- exp(logits1) / rowSums(exp(logits1))
+    pmass0 <- exp(logits0) / rowSums(exp(logits0))
+
+    ## Sample potential outcomes.
+    Y1 <- apply(pmass1, 1, function(p) sample(classes, size = 1, prob = p))
+    Y0 <- apply(pmass0, 1, function(p) sample(classes, size = 1, prob = p))
   } else if (outcome_type == "ordered") {
+    ## Generate latent potential outcomes with ATE tau.
+    tau <- 2
+
+    Ystar1 <- tau + rowSums(X) + rnorm(n)
+    Ystar0 <- rowSums(X) + rnorm(n)
+
+    ## Discretize to construct potential outcomes.
+    zeta <- c(2, 3)
+
+    Y1 <- cut(Ystar1, breaks = c(-Inf, zeta, Inf), labels = classes, right = TRUE)
+    Y0 <- cut(Ystar0, breaks = c(-Inf, zeta, Inf), labels = classes, right = TRUE)
+
+    Y1 <- as.integer(as.character(Y1))
+    Y0 <- as.integer(as.character(Y0))
+
+    ## Probability mass functions (needed to compute probabilities of shift later).
+    pmass1 <- cbind(pnorm(zeta[1] - rowSums(X) - tau),
+                    pnorm(zeta[2] - rowSums(X) - tau) - pnorm(zeta[1] - rowSums(X) - tau),
+                    1 - pnorm(zeta[2] - rowSums(X) - tau))
+
+    pmass0 <- cbind(pnorm(zeta[1] - rowSums(X)),
+                    pnorm(zeta[2] - rowSums(X)) - pnorm(zeta[1] - rowSums(X)),
+                    1 - pnorm(zeta[2] - rowSums(X)))
   }
 
-  return(list("Y" = Y, "D" = D, "X" = X, "pscore" = pscore, "pshifts" = pshifts))
+  ## 3.) Define propensity scores and assign instrument and treatment.
+  instrument_pscore <- rep(0.5, n)
+  Z <- stats::rbinom(n, 1, instrument_pscore)
+
+  pscore <- (X[, 1] + X[, 3] + Z) / 3
+  D <- stats::rbinom(n, 1, pscore)
+
+  ## 4.) Generate observed outcomes.
+  Y <- D * Y1 + (1 - D) * Y0
+
+  ## 5.) Probabilities of shift.
+  local_pshifts <- colMeans(pmass1[D == Z, ] - pmass0[D == Z, ])
+
+  ## 6.) Output.
+  return(list("Y" = Y, "D" = D, "Z" = Z, "pscore" = pscore, "instrument_pscore" = instrument_pscore, "local_pshifts" = local_pshifts))
 }
 
 
@@ -179,8 +307,8 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
 #' which allows us to analytically compute the probabilities of shift.
 #'
 #' ## Treatment assignment
-#' Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = (X_{i1} + X_{i2}) / 2}.
-#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = 0.5}.
+#' Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
+#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i2}) / 2}.
 #'
 #' ## Other details
 #' The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_{is}} are always constructed using the usual observational rule.
