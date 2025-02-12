@@ -20,6 +20,7 @@ Imports:
     lmtest,
     magrittr,
     ocf,
+    rdrobust,
     sandwich,
     stats,
     stringr

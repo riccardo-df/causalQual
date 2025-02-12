@@ -38,6 +38,9 @@ summary.causalQual <- function(object, ...) {
   } else if (object$identification == "iv") {
     identification <- "Instrumental Variables"
     estimand <- "Local Probability Shifts"
+  } else if (object$identification == "rd") {
+    identification <- "Regression Discontinuity"
+    estimand <- "Probability Shifts at the Cutoff"
   } else if (object$identification == "diff_in_diff") {
     identification <- "Difference-in-Differences"
     estimand <- "Probability Shifts on the Treated"
@@ -53,22 +56,14 @@ summary.causalQual <- function(object, ...) {
   cat("Fraction treated units: ", mean(object$data$D), "\n\n")
 
   cli::cli_h2("Point estimates and 95\\% confidence intervals")
-  if (object$identification == "selection_on_observables") {
-    estimates <- object$estimates$pshifts
-    standard_errors <- object$standard_errors$pshifts
-  } else if (object$identification == "iv") {
-    estimates <- object$estimates$local_pshifts
-    standard_errors <- object$standard_errors$local_pshifts
-  } else if (object$identification == "diff_in_diff") {
-    estimates <- object$estimates$pshifts_treated
-    standard_errors <- object$standard_errors$pshifts_treated
-  }
-
-  ci_lower <- format(round(standard_errors - 1.96 * standard_errors, 3), nsmall = 3)
-  ci_upper <- format(round(standard_errors + 1.96 * standard_errors, 3), nsmall = 3)
-
+  estimates <- object$estimates
   estimates <- format(round(estimates, 3), nsmall = 3)
-  standard_errors <- format(round(standard_errors, 3), nsmall = 3)
+
+  ci_lower <- object$confidence_intervals$lower
+  ci_upper <- object$confidence_intervals$upper
+
+  ci_lower <- format(round(ci_lower, 3), nsmall = 3)
+  ci_upper <- format(round(ci_upper, 3), nsmall = 3)
 
   formatted_cis <- paste0("[", ci_lower, ", ", ci_upper, "]")
 
@@ -157,10 +152,10 @@ plot.causalQual <- function(x, hline = TRUE, ...) {
   ci_upper <- NULL
 
   ## 1.) Prepare data for plot.
-  plot_data <- data.frame(class = factor(seq_along(x$estimates[[1]]), labels = paste0("Class ", seq_along(x$estimates[[1]]))),
-                          estimate = x$estimates[[1]],
-                          ci_lower = x$estimates[[1]] - 1.96 * x$standard_errors[[1]],
-                          ci_upper = x$estimates[[1]] + 1.96 * x$standard_errors[[1]])
+  plot_data <- data.frame(class = factor(seq_along(x$estimates), labels = paste0("Class ", seq_along(x$estimates))),
+                          estimate = x$estimates,
+                          ci_lower = x$estimates - 1.96 * x$standard_errors,
+                          ci_upper = x$estimates + 1.96 * x$standard_errors)
 
   ## 2.) Construct plot.
   plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = class, y = estimate)) +

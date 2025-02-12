@@ -23,23 +23,23 @@ independent or conditionally (on the covariates) independent of potential outcom
 \details{
 \subsection{Outcome type}{
 
-Potential outcomes are generated differently according to \code{outcome_type}. If \code{outcome_type == "multinomial"}, the function computes linear predictors for each class using the covariates:
+Potential outcomes are generated differently according to \code{outcome_type}. If \code{outcome_type == "multinomial"}, \code{\link{generate_qualitative_data_soo}} computes linear predictors for each class using the covariates:
 
-\deqn{\eta_{mi} (d) = \beta_{m1}^d X_{i1} + \beta_{m2}^d X_{i2} + \beta_{m3}^d X_{i3},}
+\deqn{\eta_{mi} (d) = \beta_{m1}^d X_{i1} + \beta_{m2}^d X_{i2} + \beta_{m3}^d X_{i3}, \quad d = 0, 1,}
 
 and then transforms \eqn{\eta_{mi} (d)} into valid probability distributions using the softmax function:
 
-\deqn{P(Y(d) = m \mid X) = \frac{\exp(\eta_{mi (d)})}{\sum_{m'} \exp(\eta_{m'i(d)})}.}
+\deqn{P(Y_i(d) = m | X_i) = \frac{\exp(\eta_{mi} (d))}{\sum_{m'} \exp(\eta_{m'i}(d))}, \quad d = 0, 1.}
 
-It then generates potential outcomes \eqn{Y(1)} and \eqn{Y(0)} by sampling from \{1, 2, 3\} using \eqn{P(Y(d) = m \mid X)}.\cr
+It then generates potential outcomes \eqn{Y_i(1)} and \eqn{Y_i(0)} by sampling from \{1, 2, 3\} using \eqn{P(Y_i(d) = m | X_i), \, d = 0, 1}.\cr
 
-If instead \code{outcome_type == "ordered"}, we first generate latent potential outcomes:
+If instead \code{outcome_type == "ordered"}, \code{\link{generate_qualitative_data_soo}} first generates latent potential outcomes:
 
-\deqn{Y_i^* (d) = \tau d + X_{i1} + X_{i2} + X_{i3} + N (0, 1),}
+\deqn{Y_i^* (d) = \tau d + X_{i1} + X_{i2} + X_{i3} + N (0, 1), \quad d = 0, 1,}
 
-with \eqn{\tau = 2}. We then construct \eqn{Y_i (d)} by discretizing \eqn{Y_i^* (d)} using threshold parameters \eqn{\zeta_1 = 2} and \eqn{\zeta_2 = 4}. We then have
+with \eqn{\tau = 2}. It then constructs \eqn{Y_i (d)} by discretizing \eqn{Y_i^* (d)} using threshold parameters \eqn{\zeta_1 = 2} and \eqn{\zeta_2 = 4}. Then,
 
-\deqn{P(Y_i(d) = m) = P(\zeta_{m-1} < Y_i^*(d) \leq \zeta_m) = \Phi (\zeta_m - \sum_j X_{ij} - \tau d) - \Phi (\zeta_{m-1} - \sum_j X_{ij} - \tau d).}
+\deqn{P(Y_i(d) = m | X_i) = P(\zeta_{m-1} < Y_i^*(d) \leq \zeta_m | X_i) = \Phi (\zeta_m - \sum_j X_{ij} - \tau d) - \Phi (\zeta_{m-1} - \sum_j X_{ij} - \tau d), \quad d = 0, 1,}
 
 which allows us to analytically compute the probabilities of shift.
 }

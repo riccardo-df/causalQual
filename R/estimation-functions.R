@@ -120,13 +120,15 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
   }
   names(gammas) <- paste0("Class", sort(unique(Y)))
 
-  ## 4.) Pick mean and standard deviation of doubly-robust scores.
+  ## 4.) Pick mean and standard deviation of doubly-robust scores. Construct conventional confidence intervals.
   pshifts_hat <- sapply(gammas, mean)
   pshifts_hat_se <- sapply(seq_along(gammas), function(m) mean((gammas[[m]] - pshifts_hat[m])^2) / length(Y)) %>%
     sqrt()
+  cis_lower <- pshifts_hat - 1.96 * pshifts_hat_se
+  cis_upper <- pshifts_hat + 1.96 * pshifts_hat_se
 
   ## 5.) Output.
-  return(list("estimates" = list("pshifts" = pshifts_hat), "standard_errors" = list("pshifts" = pshifts_hat_se), "dr_scores" = gammas))
+  return(list("estimates" = pshifts_hat, "standard_errors" = pshifts_hat_se, "confidence_intervals" = list("lower" = cis_lower, "upper" = cis_upper), "dr_scores" = gammas))
 }
 
 
@@ -157,7 +159,7 @@ causalQual_iv <- function(Y, D, Z) {
   classes <- sort(unique(Y))
   data <- data.frame("Y" = Y, "D" = D, "Z" = Z)
 
-  ## 1.) Fit models.
+  ## 1.) Fit models. Then construct conventional confidence intervals.
   fits <- list()
   local_pshifts_hat <- numeric()
   local_pshifts_hat_se <- numeric()
@@ -171,8 +173,12 @@ causalQual_iv <- function(Y, D, Z) {
     local_pshifts_hat_se[m] <-  summary(fit)$coefficients["D", 2]
   }
 
+  cis_lower <- local_pshifts_hat - 1.96 * local_pshifts_hat_se
+  cis_upper <- local_pshifts_hat + 1.96 * local_pshifts_hat_se
+
   ## 2.) Output.
-  return(list("estimates" = list("local_pshifts" = local_pshifts_hat), "standard_errors" = list("local_pshifts" = local_pshifts_hat_se), "fits" = fits))
+  return(list("estimates" = local_pshifts_hat, "standard_errors" = local_pshifts_hat_se,
+              "confidence_intervals" = list("lower" = cis_lower, "upper" = cis_upper), "fits" = fits))
 }
 
 
@@ -218,7 +224,7 @@ causalQual_did <- function(Y_pre, Y_post, D) {
 
   data <- data.frame("Y" = Y, "D" = D_new, "time" = time, "unit_id" = unit_id)
 
-  ## 1.) Fit models.
+  ## 1.) Fit models. Then construct conventional confidence intervals.
   fits <- list()
   pshifts_treated_hat <- numeric()
   pshifts_treated_hat_se <- numeric()
@@ -233,6 +239,62 @@ causalQual_did <- function(Y_pre, Y_post, D) {
     pshifts_treated_hat_se[m] <- cluster_se["D:time", 2]
   }
 
+  cis_lower <- pshifts_treated_hat - 1.96 * pshifts_treated_hat_se
+  cis_upper <- pshifts_treated_hat + 1.96 * pshifts_treated_hat_se
+
   ## 2.) Output.
-  return(list("estimates" = list("pshifts_treated" = pshifts_treated_hat), "standard_errors" = list("pshifts_treated" = pshifts_treated_hat_se), "fits" = fits))
+  return(list("estimates" = pshifts_treated_hat, "standard_errors" = pshifts_treated_hat_se,
+              "confidence_intervals" = list("lower" = cis_lower, "upper" = cis_upper), "fits" = fits))
+}
+
+
+#' Local Polynomial Regression for Qualitative Outcomes
+#'
+#' Local polynomial regression models for qualitative outcomes to estimate the probabilities of shift at the cutoff. Identification requires that the probability mass functions of potential outcomes
+#' are continuous in the running variable (continuity).
+#'
+#' @param Y Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
+#' @param running_variable Running variable determining treatment assignment.
+#' @param cutoff Cutoff or threshold. Units with \code{running_variable < cutoff} are considered controls, while units with \code{running_variable > cutoff} are considered treated.
+#'
+#' @return A list with estimates, standard errors, and model fit information.
+#'
+#' @details
+#' This function fits local linear regressions to either side of the cutoff using optimal bandwidth calculation.
+#' It then constructs robust bias-corrected confidence intervals. All of this is done by calling the \code{\link[rdrobust]{rdrobust}} function.
+#'
+#' @import rdrobust
+#'
+#' @author Riccardo Di Francesco
+#'
+#' @export
+causalQual_rd <- function(Y, running_variable, cutoff) {
+  ## 0.) Handle inputs and checks.
+  if (!all(sort(unique(Y)) == seq_len(max(Y)))) stop("Invalid 'Y'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
+  if (is.null(running_variable)) stop("When 'identification' is 'rd', we need 'running_variable'.", call. = FALSE)
+  if (is.null(cutoff)) stop("When 'identification' is 'rd', we need 'cutoff'.", call. = FALSE)
+
+  classes <- sort(unique(Y))
+
+  ## 1.) Fit models.
+  fits <- list()
+  pshifts_cutoff_hat <- numeric()
+  pshifts_cutoff_hat_se <- numeric()
+  pshifts_cutoff_hat_ci_lower <- numeric()
+  pshifts_cutoff_hat_ci_upper <- numeric()
+
+  for (m in classes) {
+    indicator <- as.numeric(Y == m)
+    fit <- rdrobust::rdrobust(indicator, running_variable, cutoff)
+
+    fits[[paste0("Class_", m)]] <- fit
+    pshifts_cutoff_hat[m] <- fit$Estimate[2]
+    pshifts_cutoff_hat_se[m] <- fit$se[3]
+    pshifts_cutoff_hat_ci_lower[m] <- fit$ci["Robust", 1]
+    pshifts_cutoff_hat_ci_upper[m] <- fit$ci["Robust", 2]
+  }
+
+  ## 2.) Output.
+  return(list("estimates" = pshifts_cutoff_hat, "standard_errors" = pshifts_cutoff_hat_se,
+              "confidence_intervals" = list("lower" = pshifts_cutoff_hat_ci_lower, "upper" = pshifts_cutoff_hat_ci_upper), "fits" = fits))
 }
