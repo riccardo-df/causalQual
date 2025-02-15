@@ -48,7 +48,7 @@ Each function enables the estimation of well-defined and interpretable causal es
 ## Selection-on-observables
 Selection-on-observables research designs are used to identify causal effects when units are observed at some point in time, some receive treatment, and we have data on pre-treatment characteristics and post-treatment outcomes. This approach is based on the following assumptions:
 
-- **Assumption 1** (*Unconfoundedness*): $Y_i(1), Y_i(0) ⊥ D_i | X_i$.
+- **Assumption 1** (*Unconfoundedness*): $\{ Y_i(1), Y_i(0) \} ⊥ D_i | X_i$.
 - **Assumption 2** (*Common support*): $0 < \pi(X_i) < 1$.
 
 Assumption 1 states that, after conditioning on $X_i$, treatment assignment is as good as random, meaning that $X_i$ fully accounts for selection into treatment. Assumption 2 mandates that for every value of $X_i$ there are both treated and untreated units, preventing situations where no valid counterfactual exists. 
@@ -179,7 +179,7 @@ Difference-in-Differences designs are employed to identify causal effects when u
 
 For our identification purporses, we introduce the following assumption.
 
-- **Assumption 8** (*Parallel trends*): $P ( Y_{it} (0) = m | D_i = 1) - P ( Y_{it-1} (0) = m | D_i = 1 ) = P ( Y_{it} (0) = m | D_i = 0) - \PX ( Y_{it-1} (0) = m | D_i = 0 )$.
+- **Assumption 8** (*Parallel trends*): $P ( Y_{it} (0) = m | D_i = 1) - P ( Y_{it-1} (0) = m | D_i = 1 ) = P ( Y_{it} (0) = m | D_i = 0) - P ( Y_{it-1} (0) = m | D_i = 0 )$.
 
 Assumption 8 requires that the probability time shift of $Y_{is} (0)$ for class $m$ follows a similar evolution over time in both the treated and control groups.
 
