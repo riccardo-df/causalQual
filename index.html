@@ -83,8 +83,8 @@
 </h2>
 <table class="table">
 <colgroup>
-<col width="23%">
-<col width="76%">
+<col width="26%">
+<col width="73%">
 </colgroup>
 <thead><tr class="header">
 <th>Feature</th>
@@ -100,6 +100,10 @@
 <td>Instead of relying on average effects, <code>causalQual</code> models how treatment shifts probabilities over outcome categories.</td>
 </tr>
 <tr class="odd">
+<td><strong>Wide applicability</strong></td>
+<td>Supports selection-on-observables, IV, RD, and DiD.</td>
+</tr>
+<tr class="even">
 <td><strong>Extensible and open-source</strong></td>
 <td>Actively developed with planned support for staggered adoption, fuzzy regression discontinuity, and more.</td>
 </tr>
@@ -108,49 +112,12 @@
 <hr>
 </div>
 <div class="section level2">
-<h2 id="key-features">Key Features<a class="anchor" aria-label="anchor" href="#key-features"></a>
-</h2>
-<p>✔ <strong>Implements causal inference methods for qualitative outcomes</strong><br>
-✔ <strong>Supports selection-on-observables, IV, RD, DiD</strong><br>
-✔ <strong>Open-source and extensible</strong></p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="id_-installation">🚀 Installation<a class="anchor" aria-label="anchor" href="#id_-installation"></a>
 </h2>
 <p>To install the latest stable release from CRAN, run:</p>
 <pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"causalQual"</span><span class="op">)</span></span></code></pre>
-<p>To install the latest development version from GitHub, run:</p>
+<p>Alternatively, the current development version of the package can be installed using the <code>devtools</code> package:</p>
 <pre><code><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"riccardo-df/causalQual"</span><span class="op">)</span></span></code></pre>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="functionality">Functionality<a class="anchor" aria-label="anchor" href="#functionality"></a>
-</h2>
-<table class="table">
-<thead><tr class="header">
-<th>Identification strategy</th>
-<th>Function</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><strong>Selection-on-Observables</strong></td>
-<td><code><a href="reference/causalQual_soo.html">causalQual_soo()</a></code></td>
-</tr>
-<tr class="even">
-<td><strong>Instrumental Variables</strong></td>
-<td><code><a href="reference/causalQual_iv.html">causalQual_iv()</a></code></td>
-</tr>
-<tr class="odd">
-<td><strong>Regression Discontinuity</strong></td>
-<td><code><a href="reference/causalQual_rd.html">causalQual_rd()</a></code></td>
-</tr>
-<tr class="even">
-<td><strong>Difference-in-Differences</strong></td>
-<td><code><a href="reference/causalQual_did.html">causalQual_did()</a></code></td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 <div class="section level2">
