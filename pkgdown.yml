@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   causalQual-short-tutorial: causalQual-short-tutorial.html
-last_built: 2025-02-15T14:06Z
+last_built: 2025-02-15T14:09Z
 urls:
   reference: https://riccardo-df.github.io/causalQual/reference
   article: https://riccardo-df.github.io/causalQual/articles
