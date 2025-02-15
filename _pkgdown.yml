@@ -6,7 +6,7 @@ template:
 navbar:
   type: default
   left:
-  - text: "Short tutorial"
+  - text: "Introduction"
     href: articles/causalQual-short-tutorial.html
   - text: "Reference"
     href: reference/index.html
