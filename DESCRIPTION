@@ -25,3 +25,8 @@ Imports:
     sandwich,
     stats,
     stringr
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+URL: https://riccardo-df.github.io/causalQual/

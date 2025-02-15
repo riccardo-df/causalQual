@@ -1,14 +1,12 @@
 # causalQual: Causal Inference for Qualitative Outcomes
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)\
-[![CRAN](https://www.r-pkg.org/badges/version/causalQual)](https://CRAN.R-project.org/package=causalQual)\
-[![Downloads](https://cranlogs.r-pkg.org/badges/causalQual)](https://CRAN.R-project.org/package=causalQual)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CRAN](https://www.r-pkg.org/badges/version/causalQual)](https://CRAN.R-project.org/package=causalQual) [![Downloads](https://cranlogs.r-pkg.org/badges/causalQual)](https://CRAN.R-project.org/package=causalQual)
 
 ## Overview
 
-The **`causalQual`** package provides a suite of tools for estimating **causal effects** when the outcome of interest is **qualitative** - i.e., multinomial or ordered. Standard causal inference methods such as **instrumental variables (IV), regression discontinuity (RD)**, and **difference-in-differences (DiD)** are typically designed for numeric outcomes. Their direct application to qualitative outcomes leads to ill-defined estimands, rendering results arbitrary and uninterpretable.
+The `causalQual` package provides a suite of tools for estimating causal effects when the outcome of interest is qualitative - i.e., multinomial or ordered. Standard causal inference methods such as instrumental variables (IV), regression discontinuity (RD), and difference-in-differences (DiD) are typically designed for numeric outcomes. Their direct application to qualitative outcomes leads to ill-defined estimands, rendering results arbitrary and uninterpretable.
 
-This package implements the **framework introduced in Di Francesco and Mellace (2025)**, shifting the focus to **well-defined and interpretable estimands** that quantify how treatment affects the probability distribution over outcome categories. The methods remain compatible with conventional research designs, ensuring ease of implementation for applied researchers.
+This package implements the framework introduced in Di Francesco and Mellace (2025), shifting the focus to well-defined and interpretable estimands that quantify how treatment affects the probability distribution over outcome categories. The methods remain compatible with conventional research designs, ensuring ease of implementation for applied researchers.
 
 ------------------------------------------------------------------------
 
