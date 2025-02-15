@@ -1,4 +1,4 @@
-# Causal Inference for Qualitative Outcomes  <a href="https://riccardo-df.github.io/causalQual/"><img src="man/figures/causalQual.svg" align="right" height="130" /></a>
+# Causal Inference for Qualitative Outcomes <a href="https://riccardo-df.github.io/causalQual/"><img src="man/figures/causalQual.svg" align="right" height="130"/></a>
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CRAN](https://www.r-pkg.org/badges/version/causalQual)](https://CRAN.R-project.org/package=causalQual) [![Downloads](https://cranlogs.r-pkg.org/badges/causalQual)](https://CRAN.R-project.org/package=causalQual)
 
@@ -13,7 +13,7 @@ This package implements the framework introduced in Di Francesco and Mellace (20
 ## Why Use `causalQual`?
 
 | Feature                             | Benefit                                                                                                                                        |
-|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+|-----------------|-------------------------------------------------------|
 | **Avoids misleading conclusions**   | Conventional estimands are often undefined or depend on arbitrary outcome coding. `causalQual` targets interpretable and meaningful estimands. |
 | **Provides well-defined estimands** | Instead of relying on average effects, `causalQual` models how treatment shifts probabilities over outcome categories.                         |
 | **Extensible and open-source**      | Actively developed with planned support for staggered adoption, fuzzy regression discontinuity, and more.                                      |
