@@ -272,9 +272,9 @@ is estimated via an honest regression forest (Athey et al., 2019).</p>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">causalQual_soo</span>(Y, D, X, <span class="at">outcome_type =</span> <span class="st">"ordered"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>R<span class="sc">&gt;</span>  [<span class="dv">36</span>m── [<span class="dv">39</span>m  [<span class="dv">1</span>mCAUSAL INFERENCE FOR QUALITATIVE OUTCOMES [<span class="dv">22</span>m  [<span class="dv">36</span>m─────────────────────────────────── [<span class="dv">39</span>m</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>R<span class="sc">&gt;</span> ── CAUSAL INFERENCE FOR QUALITATIVE OUTCOMES ───────────────────────────────────</span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mResearch design [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Research design ──</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>R<span class="sc">&gt;</span> Identification<span class="sc">:</span>          Selection<span class="sc">-</span>on<span class="sc">-</span>Observables </span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>R<span class="sc">&gt;</span> Estimand<span class="sc">:</span>                Probability Shifts </span>
@@ -282,7 +282,7 @@ is estimated via an honest regression forest (Athey et al., 2019).</p>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>R<span class="sc">&gt;</span> Classes<span class="sc">:</span>                 <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> </span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>R<span class="sc">&gt;</span> N. units<span class="sc">:</span>                <span class="dv">2000</span> </span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>R<span class="sc">&gt;</span> Fraction treated units<span class="sc">:</span>  <span class="fl">0.52</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mPoint estimates and <span class="dv">95</span>\% confidence intervals [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Point estimates and <span class="dv">95</span>\% confidence intervals ──</span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">1</span><span class="sc">:</span> <span class="sc">-</span><span class="fl">0.585</span>  [<span class="sc">-</span><span class="fl">0.624</span>, <span class="sc">-</span><span class="fl">0.547</span>]</span>
 <span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">2</span><span class="sc">:</span> <span class="sc">-</span><span class="fl">0.018</span>  [<span class="sc">-</span><span class="fl">0.064</span>,  <span class="fl">0.027</span>]</span>
 <span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">3</span><span class="sc">:</span>  <span class="fl">0.604</span>  [ <span class="fl">0.565</span>,  <span class="fl">0.642</span>]</span></code></pre></div>
@@ -368,9 +368,9 @@ construct conventional confidence intervals.<a href="#fn3" class="footnote-ref" 
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="do">## Estimation.</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">causalQual_iv</span>(Y, D, Z)</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>R<span class="sc">&gt;</span>  [<span class="dv">36</span>m── [<span class="dv">39</span>m  [<span class="dv">1</span>mCAUSAL INFERENCE FOR QUALITATIVE OUTCOMES [<span class="dv">22</span>m  [<span class="dv">36</span>m─────────────────────────────────── [<span class="dv">39</span>m</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>R<span class="sc">&gt;</span> ── CAUSAL INFERENCE FOR QUALITATIVE OUTCOMES ───────────────────────────────────</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mResearch design [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Research design ──</span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>R<span class="sc">&gt;</span> Identification<span class="sc">:</span>          Instrumental Variables </span>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>R<span class="sc">&gt;</span> Estimand<span class="sc">:</span>                Local Probability Shifts </span>
@@ -378,7 +378,7 @@ construct conventional confidence intervals.<a href="#fn3" class="footnote-ref" 
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>R<span class="sc">&gt;</span> Classes<span class="sc">:</span>                 <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> </span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>R<span class="sc">&gt;</span> N. units<span class="sc">:</span>                <span class="dv">2000</span> </span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>R<span class="sc">&gt;</span> Fraction treated units<span class="sc">:</span>  <span class="fl">0.514</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mPoint estimates and <span class="dv">95</span>\% confidence intervals [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Point estimates and <span class="dv">95</span>\% confidence intervals ──</span>
 <span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">1</span><span class="sc">:</span> <span class="sc">-</span><span class="fl">0.632</span>  [<span class="sc">-</span><span class="fl">0.730</span>, <span class="sc">-</span><span class="fl">0.533</span>]</span>
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">2</span><span class="sc">:</span>  <span class="fl">0.037</span>  [<span class="sc">-</span><span class="fl">0.072</span>,  <span class="fl">0.146</span>]</span>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">3</span><span class="sc">:</span>  <span class="fl">0.594</span>  [ <span class="fl">0.495</span>,  <span class="fl">0.694</span>]</span></code></pre></div>
@@ -458,9 +458,9 @@ bias-corrected inference procedure of Calonico et al. (2014).<a href="#fn4" cla
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="do">## Estimation.</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">causalQual_rd</span>(Y, running_variable, cutoff)</span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>R<span class="sc">&gt;</span>  [<span class="dv">36</span>m── [<span class="dv">39</span>m  [<span class="dv">1</span>mCAUSAL INFERENCE FOR QUALITATIVE OUTCOMES [<span class="dv">22</span>m  [<span class="dv">36</span>m─────────────────────────────────── [<span class="dv">39</span>m</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>R<span class="sc">&gt;</span> ── CAUSAL INFERENCE FOR QUALITATIVE OUTCOMES ───────────────────────────────────</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mResearch design [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Research design ──</span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
 <span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>R<span class="sc">&gt;</span> Identification<span class="sc">:</span>          Regression Discontinuity </span>
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>R<span class="sc">&gt;</span> Estimand<span class="sc">:</span>                Probability Shifts at the Cutoff </span>
@@ -468,7 +468,7 @@ bias-corrected inference procedure of Calonico et al. (2014).<a href="#fn4" cla
 <span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>R<span class="sc">&gt;</span> Classes<span class="sc">:</span>                 <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> </span>
 <span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>R<span class="sc">&gt;</span> N. units<span class="sc">:</span>                <span class="dv">2000</span> </span>
 <span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>R<span class="sc">&gt;</span> Fraction treated units<span class="sc">:</span>  <span class="fl">0.5065</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mPoint estimates and <span class="dv">95</span>\% confidence intervals [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Point estimates and <span class="dv">95</span>\% confidence intervals ──</span>
 <span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">1</span><span class="sc">:</span> <span class="sc">-</span><span class="fl">0.646</span>  [<span class="sc">-</span><span class="fl">0.791</span>, <span class="sc">-</span><span class="fl">0.502</span>]</span>
 <span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">2</span><span class="sc">:</span>  <span class="fl">0.086</span>  [<span class="sc">-</span><span class="fl">0.067</span>,  <span class="fl">0.239</span>]</span>
 <span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">3</span><span class="sc">:</span>  <span class="fl">0.549</span>  [ <span class="fl">0.392</span>,  <span class="fl">0.706</span>]</span></code></pre></div>
@@ -533,9 +533,9 @@ Standard errors are clustered at the unit level and used to construct
 conventional confidence intervals.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">causalQual_did</span>(Y_pre, Y_post, D)</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>R<span class="sc">&gt;</span>  [<span class="dv">36</span>m── [<span class="dv">39</span>m  [<span class="dv">1</span>mCAUSAL INFERENCE FOR QUALITATIVE OUTCOMES [<span class="dv">22</span>m  [<span class="dv">36</span>m─────────────────────────────────── [<span class="dv">39</span>m</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>R<span class="sc">&gt;</span> ── CAUSAL INFERENCE FOR QUALITATIVE OUTCOMES ───────────────────────────────────</span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mResearch design [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Research design ──</span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>R<span class="sc">&gt;</span> </span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>R<span class="sc">&gt;</span> Identification<span class="sc">:</span>          Difference<span class="sc">-</span><span class="cf">in</span><span class="sc">-</span>Differences </span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>R<span class="sc">&gt;</span> Estimand<span class="sc">:</span>                Probability Shifts on the Treated </span>
@@ -543,7 +543,7 @@ conventional confidence intervals.</p>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>R<span class="sc">&gt;</span> Classes<span class="sc">:</span>                 <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> </span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>R<span class="sc">&gt;</span> N. units<span class="sc">:</span>                <span class="dv">2000</span> </span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>R<span class="sc">&gt;</span> Fraction treated units<span class="sc">:</span>  <span class="fl">0.4975</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>R<span class="sc">&gt;</span> ──  [<span class="dv">1</span>m [<span class="dv">1</span>mPoint estimates and <span class="dv">95</span>\% confidence intervals [<span class="dv">1</span>m [<span class="dv">22</span>m ──</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>R<span class="sc">&gt;</span> ── Point estimates and <span class="dv">95</span>\% confidence intervals ──</span>
 <span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">1</span><span class="sc">:</span> <span class="sc">-</span><span class="fl">0.571</span>  [<span class="sc">-</span><span class="fl">0.620</span>, <span class="sc">-</span><span class="fl">0.521</span>]</span>
 <span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">2</span><span class="sc">:</span> <span class="sc">-</span><span class="fl">0.063</span>  [<span class="sc">-</span><span class="fl">0.114</span>, <span class="sc">-</span><span class="fl">0.011</span>]</span>
 <span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>R<span class="sc">&gt;</span> Class <span class="dv">3</span><span class="sc">:</span>  <span class="fl">0.633</span>  [ <span class="fl">0.595</span>,  <span class="fl">0.671</span>]</span></code></pre></div>
