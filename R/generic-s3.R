@@ -32,19 +32,20 @@
 summary.causalQual <- function(object, ...) {
   if (object$identification == "selection_on_observables") {
     identification <- "Selection-on-Observables"
-    estimand <- "Probability shifts"
+    estimand <- "Probability Shifts"
   } else if (object$identification == "iv") {
     identification <- "Instrumental Variables"
     estimand <- "Local Probability Shifts"
   } else if (object$identification == "rd") {
     identification <- "Regression Discontinuity"
     estimand <- "Probability Shifts at the Cutoff"
+    object$data$D <- as.numeric(object$data$running_variable >= object$data$cutoff)
   } else if (object$identification == "diff_in_diff") {
     identification <- "Difference-in-Differences"
     estimand <- "Probability Shifts on the Treated"
   }
 
-  cli::cli_h1("CAUSAL INFERENCE WITH QUALITATIVE OUTCOMES")
+  cli::cli_h1("CAUSAL INFERENCE FOR QUALITATIVE OUTCOMES")
   cli::cli_h2("Research design")
   cat("Identification:         ", identification, "\n")
   cat("Estimand:               ", estimand, "\n")
@@ -52,7 +53,7 @@ summary.causalQual <- function(object, ...) {
   cat("Classes:                ", if (object$identification == "diff_in_diff") sort(unique(object$data$Y_pre)) else sort(unique(object$data$Y)), "\n")
   cat("N. units:               ", length(object$data$D), "\n")
   cat("Fraction treated units: ", mean(object$data$D), "\n\n")
-
+  cat("")
   cli::cli_h2("Point estimates and 95\\% confidence intervals")
   estimates <- object$estimates
   estimates <- format(round(estimates, 3), nsmall = 3)

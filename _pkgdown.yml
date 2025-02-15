@@ -1,4 +1,36 @@
 url: https://riccardo-df.github.io/causalQual/
-template:
-  bootstrap: 5
 
+template:
+  bootswatch: spacelab
+
+navbar:
+  type: default
+  left:
+  - text: "Short tutorial"
+    href: articles/causalQual-short-tutorial.html
+  - text: "Reference"
+    href: reference/index.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/riccardo-df/causalQual
+
+reference:
+  - title: Core functions
+    contents:
+      - causalQual_soo
+      - causalQual_iv
+      - causalQual_rd
+      - causalQual_did
+
+  - title: Generic S3
+    contents:
+      - print.causalQual
+      - summary.causalQual
+      - plot.causalQual
+
+  - title: Utils
+    contents:
+    - generate_qualitative_data_soo
+    - generate_qualitative_data_iv
+    - generate_qualitative_data_rd
+    - generate_qualitative_data_did

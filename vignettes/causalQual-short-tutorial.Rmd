@@ -1,19 +1,215 @@
 ---
-title: "causalQual-short-tutorial"
+title: "Introduction to causalQual"
+author: "Riccardo Di Francesco"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{causalQual-short-tutorial}
+  %\VignetteIndexEntry{Introduction to causalQual}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "R>"
 )
+
+library(causalQual)
+
+set.seed(1986)
 ```
 
-```{r setup}
-library(causalQual)
+## Introduction
+This tutorial provides an overview of the core functions in the `causalQual` package, which facilitates causal inference with qualitative outcomes under four widely used research designs:
+
+- `causalQual_soo()` for selection-on-observables designs
+- `causalQual_iv()` for instrumental variables designs
+- `causalQual_rd()` for regression discontinuity designs
+- `causalQual_did()` for difference-in-differences designs
+
+Each function enables the estimation of well-defined and interpretable causal estimands while preserving the identification assumptions specific to each research design.
+
+## Notation
+
+- $Y_i \in \{ 1, 2, \dots, M \}$ denotes the outcome of interest, which can take one of $M$ qualitative categories. These categories may exhibit a natural ordering but lack a cardinal scale, making arithmetic operations such as averaging or differencing ill-defined.
+- $Y_{is}$ denote the outcome of interest at time $s \in \{ t-1, t \}$, with $t-1$ denoting the pre-treatment period and $t$ denoting the post-treatment period.
+- $D_i \in \{0 , 1\}$ is a binary treatment indicator.
+- $X_i = (X_{i1}, \dots, X_{ik})^\top \in \mathcal{X}$ is a $k \times 1$ vector of pre-treatment covariates.
+- $Z_i \in \{ 0, 1 \}$ is a binary instrument.
+- $T_i \in \{ at, nt, co, de \}$ denotes a unit's compliance type (always-taker, never-taker, complier, defier).
+- $Y_i (d), \, d = 0, 1$ are the potential outcomes as a function of treatment status.
+- $Y_i (d, z), \, d = 0, 1, z = 0, 1$ are the potential outcomes as a function of treatment status and instrument assignment.
+- $D_i (z), \, z = 0, 1$ are the potential treatments as a function of instrument assignment.
+- $p_m (d, x) := P ( Y_i = m | D_i = d, X_i = x )$ denotes the conditional probability of observing outcome category $m$ given treatment status $D_i = d$ and covariates $X_i = x$.
+- $\pi (x) := P ( D_i = 1 | X_i = x )$ represents the propensity score.
+
+## Selection-on-Observables
+Selection-on-observables research designs are used to identify causal effects when units are observed at some point in time, some receive treatment, and we have data on pre-treatment characteristics and post-treatment outcomes. This approach is based on the following assumptions:
+
+- **Assumption 1** (*Unconfoundedness*): $Y_i(1), Y_i(0) ⊥ D_i | X_i$.
+- **Assumption 2** (*Common support*): $0 < \pi(X_i) < 1$.
+
+Assumption 1 states that, after conditioning on $X_i$, treatment assignment is as good as random, meaning that $X_i$ fully accounts for selection into treatment. Assumption 2 mandates that for every value of $X_i$ there are both treated and untreated units, preventing situations where no valid counterfactual exists. 
+
+Together, these assumptions enable the identification of the Probability of Shift (PS), defined as
+
+$$ \delta_m := P ( Y_i (1) = m ) - P ( Y_i (0) = m ). $$
+PS characterizes how treatment affects the probability distribution over outcome category $m$. For instance, $\delta_m > 0$ indicates that the treatment increases the likelihood of observing outcome category $m$, while $\delta_m < 0$ implies a decrease in the probability mass assigned to $m$ caused by the treatment. By construction, $\sum_{m = 1}^M \delta_m = 0$, reflecting the intuitive trade-off that an increase in the probability of some outcome categories must be offset by a decrease in others.
+
+For illustration, we generate a synthetic data set using the `generate_qualitative_data_soo` function. Users can modify the parameters to generate data sets with different sample sizes, treatment assignment mechanisms (randomized vs. observational), and outcome types (multinomial or ordered).
+
+- Setting `outcome_type = "multinomial"` generates a multinomial categorical outcome (e.g., brand choices, employment status).
+- Setting `outcome_type = "ordered"` generates an ordered categorical outcome (e.g., survey responses ranging from “strongly disagree” to “strongly agree”).
+
+```{r}
+## Generate synthetic data.
+n <- 2000
+data <- generate_qualitative_data_soo(n, assignment = "observational", outcome_type = "ordered")
+
+Y <- data$Y
+D <- data$D
+X <- data$X
 ```
+
+Once the data set is generated, we use `causalQual_soo` to estimate the PS for each outcome category. This function performs estimation by applying the double machine learning procedures of Chernozukov et al. (2018) to the binary variable $1(Y_i = m)$. Specifically, for each class $m$, we define the doubly robust scores as
+
+$$ \Gamma_{m, i} := p_m (1, X_i) - p_m (0, X_i) + D_i \frac{1(Y_i = m) - p_m (1, X_i)}{\pi(X_i)} - (1 - D_i) \frac{1(Y_i = m) - p_m (0, x)}{1 - \pi(X_i)}.$$
+`causalQual_soo` constructs plug-in estimates $\hat{\Gamma}_{m, i}$ of $\Gamma_{m, i}$ by replacing the unknown $p_m (1, \cdot)$, $p_m (0, \cdot)$, and $\pi(\cdot)$ with consistent estimates $\hat{p}_m (1, \cdot)$, $\hat{p}_m (0, \cdot)$, and  $\hat{\pi}(\cdot)$ obtained via $K$-fold cross fitting, with $K$ selected by the users via the `K` argument.[^1] The estimator for PS is then
+
+$$ \hat{\delta}_m = \frac{1}{n} \sum_{i=1}^{n} \hat{\Gamma}_{m, i}, $$
+and its variance is estimated as
+
+$$ \widehat{\text{Var}} ( \hat{\delta}_m ) = \frac{1}{n} \sum_{i=1}^{n} ( \hat{\Gamma}_{m, i} - \hat{\delta}_m )^2.$$
+`causalQual_soo` uses these estimates to construct confidence intervals using conventional normal approximations. Users can modify the parameters to generate data sets with different sample sizes and outcome types ("ordered" vs. "multinomial") as before.
+
+To estimate the conditional class probabilities $p_m (d, \cdot), \, d = 0, 1$, `causalQual_soo` adopts multinomial machine learning strategies when the outcome is multinomial and the honest ordered correlation forest estimator when the outcome is ordered (Di Francesco, 2025), according to the user's choice of `outcome_type`. The function trains separate models for treated and control units. The propensity score $\pi(\cdot)$ is estimated via an honest regression forest (Athey et al., 2019). 
+
+```{r}
+## Estimation.
+fit <- causalQual_soo(Y, D, X, outcome_type = "ordered")
+summary(fit)
+```
+
+## Instrumental Variables
+In some applications, the observed covariates $X_i$ may not fully account for selection into treatment, making a selection-on-observables design unsuitable. Instrumental variables (IV) designs provide a popular identification strategy to address this issue. The key idea behind IV is to exploit a variable -- an instrument -- that is as good as randomly assigned, influences treatment assignment, but has no direct effect on the outcome except through treatment. This exogenous source of variation enables the identification of causal effects by isolating changes in treatment status that are not driven by unobserved factors.
+
+Formally, IV designs rely on the following assumptions.
+
+- **Assumption 3** (*Exogeneity*): $\{ Y_i (D_i, 1), Y_i (D_i, 0), D_i(1), D_i(0) \} ⊥ Z_i$. 
+- **Assumption 4** (*Exclusion restriction*): $Y_i(d, 1) = Y_i(d, 0) = Y_i(d), \, d = 0, 1$. 
+- **Assumption 5** (*Monotonicity*): $P (D_i(1) \geq D_i(0))=1$. 
+- **Assumption 6** (*Relevance*): $P(T_i=co) > 0$.
+
+Assumption 3 mandates that the instrument is as good as randomly assigned. Assumption 4 requires that the instrument affects the outcome only through its influence on treatment, ruling out any direct effect. Assumption 5 imposes that the instrument can only increase the likelihood of treatment, ruling out defiers.[^2] Finally, Assumption 6 states that the instrument has a nonzero effect on the treatment, thereby generating exogenous variation in the latter.
+
+Together, these assumptions enable the identification of the Local Probability of Shift (LPS), defined as
+
+$$ \delta_{m, L} := P ( Y_i (1) = m | T_i = co ) - P ( Y_i (0) = m | T_i = co).$$
+LPS provides the same characterization as the PS while focusing on the complier subpopulation.
+
+For illustration, we generate a synthetic data set using the `generate_qualitative_data_iv` function. Users can modify the parameters to generate data sets with different sample sizes and outcome types (multinomial or ordered) as before, although `generate_qualitative_data_iv` does not allow to modify the treatment assignment mechanism.
+
+```{r}
+## Generate synthetic data.
+n <- 2000
+data <- generate_qualitative_data_iv(n, outcome_type = "ordered")
+
+Y <- data$Y
+D <- data$D
+Z <- data$Z
+```
+
+Once the data set is generated, we use `causalQual_iv` to estimate the LPS for each outcome category. This function performs estimation by applying the standard two-stage least squares method to the binary variable $1(Y_i = m)$. Specifically, we first estimate the following first-stage regression model via OLS:
+
+$$ D_i = \gamma_0 + \gamma_1 Z_i + \nu_i,$$
+
+and construct the predicted values $\widehat{D}_i$. We then use these predicted values in the second-stage regressions:
+
+$$ 1(Y_i = m) = \alpha_{m0} + \alpha_{m1} \widehat{D}_i + \epsilon_{mi}, \quad m = 1, \dots M.$$
+
+A well-established result in the IV literature is that, under Assumptions 3-5, $\alpha_{m1} = \delta_{m, L}$ (Imbens and Angrist, 1994; Angrist et al., 1996). Therefore, we estimate the second-stage regression models via OLS and use the resulting estimate $\hat{\alpha}_{m1}$ as an estimate of $\delta_{m, L}$. Standard errors are computed using standard procedures and used to construct conventional confidence intervals.[^3]
+
+```{r}
+## Estimation.
+fit <- causalQual_iv(Y, D, Z)
+summary(fit)
+```
+
+## Regression Discontinuity
+Regression Discontinuity designs are employed to identify causal effects when treatment assignment is determined by whether a continuous variable crosses a known threshold or cutoff. The key assumption is that units just above and just below the cutoff are comparable, meaning that any discontinuity in outcomes at the threshold can be attributed to the treatment rather than to pre-existing differences.
+
+In this section, we let $X_i$ be a single observed covariate (rather than a vector of covariates) and we call it \open running variable." By construction, $X_i$ fully determines treatment assignment. Specifically, units receive treatment if and only if their running variable exceeds a predetermined threshold $c$. Thus, $D_i = 1(X_i \geq c)$.
+
+By construction, Assumption 1 above is satisfied since conditioning on $X_i$ fully determines $D_i$. For our identification purporses, we introduce an additional assumption.
+
+- **Assumption 7** (*Continuity*): $P( Y_i(d) = m | X_i = x )$ is continuous in $x$ for $d = 0, 1$. 
+
+Assumption 7 requires that the conditional probability mass functions of potential outcomes evolve smoothly with $x$. This ensures that class probabilities remain comparable in a neighborhood of $c$.
+
+Assumptions 1 and 7 enable the identification of the Probability of Shift at the Cutoff (PSC) for class $m$, defined as 
+
+$$ \delta_{m, C} := P ( Y_i (1) = m | X_i = c ) - P ( Y_i (0) = m | X_i = c).$$
+
+PSC provides the same characterization as the PS while focusing on the subpopulation of units whose running variable values are "close" to the cutoff $c$.
+
+For illustration, we generate a synthetic data set using the `generate_qualitative_data_rd` function. Users can modify the parameters to generate data sets with different sample sizes and outcome types (multinomial or ordered) as before, although `generate_qualitative_data_rd` does not allow to modify the treatment assignment mechanism.
+
+```{r}
+## Generate synthetic data.
+n <- 2000
+data <- generate_qualitative_data_rd(n, outcome_type = "ordered")
+
+Y <- data$Y
+running_variable <- data$running_variable
+cutoff <- data$cutoff
+```
+
+Once the data set is generated, we use `causalQual_rd` to estimate the PSC for each outcome category. This function performs estimation using standard local polynomial estimators applied to to the binary variable $1(Y_i = m)$. Specifically, `causalQual_rd` implements the robust bias-corrected inference procedure of Calonico et al. (2014).[^4]
+
+```{r}
+## Estimation.
+fit <- causalQual_rd(Y, running_variable, cutoff)
+summary(fit)
+```
+
+## Difference-in-Differences
+Difference-in-Differences designs are employed to identify causal effects when units are observed over time and treatment is introduced only from a certain point onward for some units. The key assumption is that, in the absence of treatment, the change in outcomes for treated units would have mirrored the change observed in the control group.
+
+For our identification purporses, we introduce the following assumption.
+
+- **Assumption 8** (*Parallel trends*): $P ( Y_{it} (0) = m | D_i = 1) - P ( Y_{it-1} (0) = m | D_i = 1 ) = P ( Y_{it} (0) = m | D_i = 0) - \PX ( Y_{it-1} (0) = m | D_i = 0 )$.
+
+Assumption 8 requires that the probability time shift of $Y_{is} (0)$ for class $m$ follows a similar evolution over time in both the treated and control groups.
+
+Assumptions 8 enables the identification of the Probability of Shift on the Treated (PST) for class $m$, defined as 
+
+$$ \delta_{m, T} := P ( Y_{it} (1) = m | D_i = 1 ) - P ( Y_{it} (0) = m | D_i = 1).$$
+
+PSt provides the same characterization as the PS while focusing on the subpopulation of treated units.
+
+For illustration, we generate a synthetic data set using the `generate_qualitative_data_did` function. As before, users can modify the parameters to generate data sets with different sample sizes, treatment assignment mechanisms (randomized vs. observational), and outcome types (multinomial or ordered).
+
+```{r}
+n <- 2000
+data <- generate_qualitative_data_did(n, assignment = "observational", outcome_type = "ordered")
+
+Y_pre <- data$Y_pre
+Y_post <- data$Y_post
+D <- data$D
+```
+
+Once the data set is generated, we use `causalQual_did` to estimate the PST for each outcome category. This function performs estimation by applying the canonical two-group/two-period DiD method to the binary variable $1(Y_i = m)$. Specifically, consider the following linear regression model:
+
+$$ 1 (Y_is = m) = D_i \beta_{m1} + 1(s = t) \beta_{m2} + D_i 1(s = t) \beta_{m3} + \epsilon_{mis}.$$
+
+A well-established result in the DiD literature is that, under Assumption 8, $\beta_{m3} = \delta_{m, T}$. Therefore, we estimate the above model via OLS and use the resulting estimate $\hat{\beta}_{m3}$ as an estimate of $\delta_{m, T}$. Standard errors are clustered at the unit level and used to construct conventional confidence intervals.
+
+```{r}
+fit <- causalQual_did(Y_pre, Y_post, D)
+summary(fit)
+```
+
+[^1]: A potential issue in estimation arises if, after splitting the sample into folds and each fold into treated and control groups, at least one class of $Y_i$ is unobserved within a given fold for a specific treatment group. To mitigate this issue, `causalQual_soo` repeatedly splits the data until all outcome categories are present in each fold and treatment group.
+[^2]: This assumption is made without loss of generality; one could alternatively assume that the instrument can only decrease the probability of treatment.
+[^3]: `causalQual_iv` implements this two-stage least squares procedure by calling the `ivreg` function from the R package `AER`.
+[^4]: `causalQual_rd` implements these methodologies by calling the `rdrobust` function from the R package `rdrobust` (Calonico et al., 2015).
