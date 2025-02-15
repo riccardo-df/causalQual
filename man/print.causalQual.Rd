@@ -28,14 +28,12 @@ D <- data$D
 X <- data$X
 
 ## Estimate probabilities of shifts.
-fit <- causalQual(Y = Y, D = D, X = X,
-                  identification = "selection_on_observables",
-                  outcome_type = "ordered")
+fit <- causalQual_soo(Y = Y, D = D, X = X, outcome_type = "ordered")
 print(fit)}
 
 }
 \seealso{
-\code{\link{causalQual}}
+causalQual
 }
 \author{
 Riccardo Di Francesco

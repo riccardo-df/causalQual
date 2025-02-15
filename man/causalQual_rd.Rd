@@ -2,27 +2,51 @@
 % Please edit documentation in R/estimation-functions.R
 \name{causalQual_rd}
 \alias{causalQual_rd}
-\title{Local Polynomial Regression for Qualitative Outcomes}
+\title{Causal Inference for Qualitative Outcomes under Regression Discontinuity}
 \usage{
 causalQual_rd(Y, running_variable, cutoff)
 }
 \arguments{
-\item{Y}{Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.}
+\item{Y}{Qualitative outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.}
 
 \item{running_variable}{Running variable determining treatment assignment.}
 
-\item{cutoff}{Cutoff or threshold. Units with \code{running_variable < cutoff} are considered controls, while units with \code{running_variable > cutoff} are considered treated.}
+\item{cutoff}{Cutoff or threshold. Units with \code{running_variable < cutoff} are considered controls, while units with \code{running_variable >= cutoff} are considered treated.}
 }
 \value{
-A list with estimates, standard errors, and model fit information.
+An object of class \code{causalQual}.
 }
 \description{
-Local polynomial regression models for qualitative outcomes to estimate the probabilities of shift at the cutoff. Identification requires that the probability mass functions of potential outcomes
-are continuous in the running variable (continuity).
+Fit local polynomial regression models for qualitative outcomes to estimate the probabilities of shift at the cutoff.
 }
 \details{
-This function fits local linear regressions to either side of the cutoff using optimal bandwidth calculation.
-It then constructs robust bias-corrected confidence intervals. All of this is done by calling the \code{\link[rdrobust]{rdrobust}} function.
+Under a regression discontinuity design, identification requires that the probability mass functions for class \eqn{m} of potential outcomes are continuous in the running variable (continuity). If this assumption holds,
+we can recover the probability shift at the cutoff for class \eqn{m}:
+
+\deqn{\delta_{m, C} := P(Y_i (1) = m | Running_i = cutoff) - P(Y_i(0) = m | Running_i = cutoff).}
+
+\code{\link{causalQual_rd}} applies, for each class \eqn{m}, standard local polynomial estimators to the binary variable \eqn{1(Y_i = m)}. Specifically, the ruotine implements the
+robust bias-corrected inference procedure of Calonico et al. (2014) (see the \code{\link[rdrobust]{rdrobust}} function).
+}
+\examples{
+\donttest{## Generate synthetic data.
+set.seed(1986)
+
+data <- generate_qualitative_data_rd(1000, outcome_type = "ordered")
+
+Y <- data$Y
+running_variable <- data$running_variable
+cutoff <- data$cutoff
+
+## Estimate probabilities of shift at the cutoff.
+fit <- causalQual_rd(Y, running_variable, cutoff)
+
+summary(fit)
+plot(fit)}
+
+}
+\seealso{
+\code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_did}}
 }
 \author{
 Riccardo Di Francesco

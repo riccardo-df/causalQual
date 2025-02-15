@@ -17,7 +17,7 @@ generate_qualitative_data_soo(n, assignment, outcome_type)
 A list storing a data frame with the observed data, the true propensity score, and the true probabilities of shift.
 }
 \description{
-Generate a synthetic data set with qualitative outcomes for a selection-on-observables setting. The data include a binary treatment indicator and a matrix of covariates. The treatment is either
+Generate a synthetic data set with qualitative outcomes under a selection-on-observables design. The data include a binary treatment indicator and a matrix of covariates. The treatment is either
 independent or conditionally (on the covariates) independent of potential outcomes, depending on users' choices.
 }
 \details{
@@ -47,7 +47,7 @@ which allows us to analytically compute the probabilities of shift.
 \subsection{Treatment assignment}{
 
 Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
-If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i2}) / 2}.
+If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i3}) / 2}.
 }
 
 \subsection{Other details}{
@@ -67,7 +67,7 @@ data$pshifts}
 
 }
 \seealso{
-\code{\link{causalQual}}
+\code{\link{generate_qualitative_data_iv}} \code{\link{generate_qualitative_data_rd}} \code{\link{generate_qualitative_data_did}}
 }
 \author{
 Riccardo Di Francesco

@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimation-functions.R
 \name{causalQual_did}
 \alias{causalQual_did}
-\title{Two-Way Fixed Effects Models for Qualitative Outcomes}
+\title{Causal Inference for Qualitative Outcomes under Difference-in-Differences}
 \usage{
 causalQual_did(Y_pre, Y_post, D)
 }
@@ -14,15 +14,45 @@ causalQual_did(Y_pre, Y_post, D)
 \item{D}{Binary treatment indicator.}
 }
 \value{
-A list with estimates, standard errors, and model fit information.
+An object of class \code{causalQual}.
 }
 \description{
-Fit two-way fixed-effect models for qualitative outcomes to estimate the probabilities of shift on the treated. Identification requires that the probability time shifts follow
-a similar evolution over time in both the treated and control groups (parallel trends on the mass functions).
+Fit two-group/two-period models for qualitative outcomes to estimate the probabilities of shift on the treated.
 }
 \details{
-This function fits one linear model for each class \eqn{m} of \code{Y}. Each model uses a binary indicator \code{Y == m} as an outcome and a time dummy, a treatment dummy (\code{D}), and an interaction thereof
-as regressors. Standard errors are clustered at the unit level.
+Under a difference-in-difference design, identification requires that the probabilities time shift for \eqn{Y_{is} (0)} for class \eqn{m} evolve similarly for the treated and control groups (parallel
+trends on the probability mass functions of \eqn{Y_{is}(0)}). If this assumption holds, we can recover the probability of shift on the treated for class \eqn{m}:
+
+\deqn{\delta_{m, T} := P(Y_{it} (1) = m | D_i = 1) - P(Y_{it}(0) = m | D_i = 1).}
+
+\code{\link{causalQual_did}} applies, for each class \eqn{m}, the canonical two-group/two-period method to the binary variable \eqn{1(Y_{is} = m)}. Specifically,
+consider the following linear model:
+
+\deqn{1(Y_{is} = m) = D_i \beta_{m1} + 1(s = t) \beta_{m2} + D_i 1(s = t) \beta_{m3} + \epsilon_{mis}.}
+
+The OLS estimate \eqn{\hat{\beta}_{m3}} of \eqn{\beta_{m3}} is our estimate of the probability shift on the treated for class \code{m}. Standard errors are clustered at the unit level and used to construct
+conventional confidence intervals.
+}
+\examples{
+\donttest{## Generate synthetic data.
+set.seed(1986)
+
+data <- generate_qualitative_data_did(1000, assignment = "observational",
+                                      outcome_type = "ordered")
+
+Y_pre <- data$Y_pre
+Y_post <- data$Y_post
+D <- data$D
+
+## Estimate probabilities of shift on the treated.
+fit <- causalQual_did(Y_pre, Y_post, D)
+
+summary(fit)
+plot(fit)}
+
+}
+\seealso{
+\code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_rd}}
 }
 \author{
 Riccardo Di Francesco

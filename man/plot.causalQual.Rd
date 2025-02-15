@@ -7,15 +7,19 @@
 \method{plot}{causalQual}(x, hline = TRUE, ...)
 }
 \arguments{
-\item{x}{An \code{\link{causalQual}} object.}
+\item{x}{An \code{causalQual} object.}
 
 \item{hline}{Logical, whether to display an horizontal line at zero in the plot.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-Plots an \code{\link{causalQual}} object.
-
+Plots an causalQual object.
+}
+\description{
+Plots an \code{causalQual} object.
+}
+\examples{
 \donttest{## Generate synthetic data.
 set.seed(1986)
 
@@ -26,16 +30,12 @@ D <- data$D
 X <- data$X
 
 ## Estimate probabilities of shifts.
-fit <- causalQual(Y = Y, D = D, X = X,
-                  identification = "selection_on_observables",
-                  outcome_type = "ordered")
+fit <- causalQual_soo(Y = Y, D = D, X = X, outcome_type = "ordered")
 plot(fit)}
-}
-\description{
-Plots an \code{\link{causalQual}} object.
+
 }
 \seealso{
-\code{\link{causalQual}}
+causalQual
 }
 \author{
 Riccardo Di Francesco

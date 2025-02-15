@@ -15,7 +15,7 @@ generate_qualitative_data_iv(n, outcome_type)
 A list storing a data frame with the observed data, the true propensity score, the true instrument propensity score, and the true local probabilities of shift.
 }
 \description{
-Generate a synthetic data set with qualitative outcomes for an instrumental variables setting. The data include a binary treatment indicator and a binary instrument. Potential outcomes
+Generate a synthetic data set with qualitative outcomes under an instrumental variables design. The data include a binary treatment indicator and a binary instrument. Potential outcomes
 and potential treatments are independent of the instrument. Moreover, the instrument does not directly impact potential outcomes, has an impact on treatment probability, and can only increase the probability
 of treatment.
 }
@@ -46,7 +46,7 @@ which allows us to analytically compute the local probabilities of shift.
 \subsection{Treatment assignment and instrument}{
 
 The instrument is always generated as \eqn{Z_i \sim \text{Bernoulli}(0.5)}. Treatment is always modeled as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i, Z_i))}, with
-\eqn{\pi(X_i, Z_i) = P ( D_i = 1 | X_i, Z_i)) = (X_{i1} + X_{i2} + Z_i) / 3}. Thus, \eqn{Z_i} can increase the probability of treatment intake but cannot decrease it.
+\eqn{\pi(X_i, Z_i) = P ( D_i = 1 | X_i, Z_i)) = (X_{i1} + X_{i3} + Z_i) / 3}. Thus, \eqn{Z_i} can increase the probability of treatment intake but cannot decrease it.
 }
 
 \subsection{Other details}{
@@ -65,7 +65,7 @@ data$local_pshifts}
 
 }
 \seealso{
-\code{\link{causalQual}}
+\code{\link{generate_qualitative_data_soo}} \code{\link{generate_qualitative_data_rd}} \code{\link{generate_qualitative_data_did}}
 }
 \author{
 Riccardo Di Francesco

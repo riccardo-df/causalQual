@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimation-functions.R
 \name{causalQual_soo}
 \alias{causalQual_soo}
-\title{Double Machine Learning for Qualitative Outcomes}
+\title{Causal Inference for Qualitative Outcomes under Selection-on-Observables}
 \usage{
 causalQual_soo(Y, D, X, outcome_type, K = 5)
 }
@@ -18,42 +18,71 @@ causalQual_soo(Y, D, X, outcome_type, K = 5)
 \item{K}{Number of folds for nuisance functions estimation.}
 }
 \value{
-A list with estimates, standard errors, and doubly-robust scores.
+An object of class \code{causalQual}.
 }
 \description{
-Construct and average doubly robust scores for qualitative outcomes to estimate the probabilities of shift. Identification requires the treatment indicator to be (conditionally) independent of potential outcomes
-(unconfoundedness), and that each unit has a non-zero probability of being treated (common support).
+Construct and average doubly robust scores for qualitative outcomes to estimate the probabilities of shift.
 }
 \details{
-For each class \eqn{m} of \code{Y}, the doubly robust score is defined as:
+Under a selection-on-observables design, identification requires the treatment indicator to be (conditionally) independent of potential outcomes
+(unconfoundedness), and that each unit has a non-zero probability of being treated (common support). If these assumptions hold, we can recover the
+probabilities of shift of all classes:
+
+\deqn{\delta_m := P(Y_i(1) = m) - P(Y_i(0) = m), \, m = 1, \dots, M.}
+
+\code{\link{causalQual_soo}} constructs and averages doubly robust scores for qualitative outcomes
+to estimate \eqn{\delta_m}. For each class \eqn{m}, the doubly robust score for unit \eqn{i} is defined as:
+
 \deqn{
     \hat{\Gamma}_{m, i} =
-    \hat{P}(Y = m \mid D = 1, X_i) - \hat{P}(Y = m \mid D = 0, X_i) +
-    D_i \frac{1\{Y = m\} - \hat{P}(Y = m \mid D = 1, X_i)}{\hat{P}(D_i = 1 | X_i)}
-    - (1 - D_i) \frac{1\{Y = m\} - \hat{P}(Y = m \mid D = 0, X_i)}{1 - \hat{P}(D_i = 1 | X_i)}.
+    \hat{P}(Y_i = m \mid D_i = 1, X_i) -
+    \hat{P}(Y_i = m \mid D_i = 0, X_i) +
 }
-
-The estimator for the probability shift is then the average of the scores:
 \deqn{
-    \hat{\delta}_m = \frac{1}{n} \sum_{i=1}^{n} \hat{\Gamma}_{m, i}.
+    D_i \frac{1\{Y_i = m\} - \hat{P}(Y_i = m \mid D_i = 1, X_i)}
+    {\hat{P}(D_i = 1 | X_i)}
+    - (1 - D_i) \frac{1\{Y_i = m\} - \hat{P}(Y_i = m \mid D_i = 0, X_i)}
+    {1 - \hat{P}(D_i = 1 | X_i)}.
 }
 
-The variance of \eqn{\hat{\delta}_m} is estimated as:
+The estimator for \eqn{\delta_m} is then the average of the scores:
+
+\deqn{\hat{\delta}_m = \frac{1}{n} \sum_{i=1}^{n} \hat{\Gamma}_{m, i},}
+
+with its variance estimated as:
 \deqn{
     \widehat{\text{Var}} ( \hat{\delta}_m ) = \frac{1}{n} \sum_{i=1}^{n} ( \hat{\Gamma}_{m, i} - \hat{\delta}_m )^2.
 }
 
-If \code{outcome_type == "multinomial"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using a \code{\link[ocf]{multinomial_ml}} strategy with regression forests
-as base learner. Else, if \code{outcome_type == "ordered"}, \eqn{\hat{P}(Y = m \mid D = 1, X)} and \eqn{\hat{P}(Y = m \mid D = 0, X)} are estimated using the honest version of the \code{\link[ocf]{ocf}} estimator.
-\eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. K-fold cross-fitting is employed.\cr
+\code{\link{causalQual_soo}} uses these estimates to construct confidence intervals based on conventional normal approximations.\cr
+
+If \code{outcome_type == "multinomial"}, \eqn{\hat{P}(Y_i = m \mid D_i = 1, X_i)} and \eqn{\hat{P}(Y_i = m \mid D_i = 0, X_i)} are estimated using a \code{\link[ocf]{multinomial_ml}} strategy with regression forests
+as base learners. Else, if \code{outcome_type == "ordered"}, \eqn{\hat{P}(Y_i = m \mid D_i = 1, X_i)} and \eqn{\hat{P}(Y_i = m \mid D_i = 0, X_i)} are estimated using the honest version of the \code{\link[ocf]{ocf}} estimator.
+\eqn{\hat{P}(D_i = 1 | X_i)} is always estimated via a honest \code{\link[grf]{regression_forest}}. \code{K}-fold cross-fitting is employed for the estimation of all these functions.\cr
 
 Folds are created by random split. If some class of \code{Y} is not observed in one or more folds for one or both treatment groups, a new random partition is performed. This process is repeat until when all
 classes are observed in all folds and for all treatment groups up to 1000 times, after which the routine raises an error.
 }
+\examples{
+\donttest{## Generate synthetic data.
+set.seed(1986)
+
+data <- generate_qualitative_data_soo(1000, assignment = "observational",
+                                      outcome_type = "ordered")
+Y <- data$Y
+D <- data$D
+X <- data$X
+
+# Estimate probabilities of shift.
+fit <- causalQual_soo(Y, D, X, outcome_type = "ordered", K = 2)
+
+summary(fit)
+plot(fit)}
+
+}
 \seealso{
-\code{\link{causalQual}}
+\code{\link{causalQual_iv}} \code{\link{causalQual_rd}} \code{\link{causalQual_did}}
 }
 \author{
 Riccardo Di Francesco
 }
-\keyword{internal}

@@ -15,7 +15,7 @@ generate_qualitative_data_rd(n, outcome_type)
 A list storing a data frame with the observed data, and the true probabilities of shift at the cutoff.
 }
 \description{
-Generate a synthetic data set with qualitative outcomes for a regression discontinuity setting. The data include a binary treatment indicator and a single covariate (the running variable). The conditional
+Generate a synthetic data set with qualitative outcomes under a regression discontinuity design. The data include a binary treatment indicator and a single covariate (the running variable). The conditional
 probability mass fuctions of potential outcomes are continuous in the running variable.
 }
 \details{
@@ -63,7 +63,7 @@ data$pshifts_cutoff}
 
 }
 \seealso{
-\code{\link{causalQual}}
+\code{\link{generate_qualitative_data_soo}} \code{\link{generate_qualitative_data_iv}} \code{\link{generate_qualitative_data_did}}
 }
 \author{
 Riccardo Di Francesco

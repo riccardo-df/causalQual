@@ -7,15 +7,15 @@
 \method{summary}{causalQual}(object, ...)
 }
 \arguments{
-\item{object}{An \code{\link{causalQual}} object.}
+\item{object}{An \code{causalQual} object.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-Summarizes an \code{\link{causalQual}} object.
+Summarizes an \code{causalQual} object.
 }
 \description{
-Summarizes an \code{\link{causalQual}} object.
+Summarizes an \code{causalQual} object.
 }
 \examples{
 \donttest{## Generate synthetic data.
@@ -28,14 +28,12 @@ D <- data$D
 X <- data$X
 
 ## Estimate probabilities of shifts.
-fit <- causalQual(Y = Y, D = D, X = X,
-                  identification = "selection_on_observables",
-                  outcome_type = "ordered")
+fit <- causalQual_soo(Y = Y, D = D, X = X, outcome_type = "ordered")
 summary(fit)}
 
 }
 \seealso{
-\code{\link{causalQual}}
+causalQual
 }
 \author{
 Riccardo Di Francesco

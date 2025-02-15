@@ -18,7 +18,7 @@ or \code{"observational"} (assignment based on covariates).}
 A list storing a data frame with the observed data, the true propensity score, and the true probabilities of shift on the treated.
 }
 \description{
-Generate a synthetic data set with qualitative outcomes for a difference-in-differences setting. The data include two time periods, a binary treatment indicator (applied only in the second period),
+Generate a synthetic data set with qualitative outcomes under a difference-in-differences design. The data include two time periods, a binary treatment indicator (applied only in the second period),
 and a matrix of covariates. Probabilities time shift among the treated and control groups evolve similarly across the two time periods (parallel trends on the probability mass functions).
 }
 \details{
@@ -48,7 +48,7 @@ which allows us to analytically compute the probabilities of shift on the treate
 \subsection{Treatment assignment}{
 
 Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
-If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i2}) / 2}.
+If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i3}) / 2}.
 }
 
 \subsection{Other details}{
@@ -66,4 +66,10 @@ data <- generate_qualitative_data_did(100,
 
 data$pshifts_treated}
 
+}
+\seealso{
+\code{\link{generate_qualitative_data_soo}} \code{\link{generate_qualitative_data_iv}} \code{\link{generate_qualitative_data_rd}}
+}
+\author{
+Riccardo Di Francesco
 }

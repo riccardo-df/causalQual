@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimation-functions.R
 \name{causalQual_iv}
 \alias{causalQual_iv}
-\title{Two-Stage Least Squares for Qualitative Outcomes}
+\title{Causal Inference for Qualitative Outcomes under Instrumental Variables}
 \usage{
 causalQual_iv(Y, D, Z)
 }
@@ -14,15 +14,49 @@ causalQual_iv(Y, D, Z)
 \item{Z}{Binary instrument.}
 }
 \value{
-A list with estimates, standard errors, and model fit information.
+An object of class \code{causalQual}.
 }
 \description{
-Fit two-stage least squares models for qualitative outcomes to estimate the local probabilities of shift. Identification requires the instrument to be independent of potential outcomes and
-potential treatments (exogeneity) and not to have any direct effect on potential outcomes (exclusion restriction). The instrument must also have a non-zero impact on treatment probability
-(relevance) and to only increase/decrease that probability (monotonicity).
+Fit two-stage least squares models for qualitative outcomes to estimate the local probabilities of shift.
 }
 \details{
-This function fits one two-stage least squares model for each class \eqn{m} of \code{Y}. Each model uses a binary indicator \code{Y == m} as an outcome.
+Under an instrumental-variables design, identification requires the instrument to be independent of potential outcomes and potential treatments (exogeneity), that the
+instrument influences the outcome solely through its effect on treatment (exclusion restriction), that the instrument has a nonzero effect on treatment probability (relevance), and that the instrument can only
+increase/decrease the treatment probability (monotonicity). If these assumptions hold, we can recover the local probabilities of shift for all classes:\cr
+
+\deqn{\delta_{m, L} := P(Y_i(1) = m | i \, is \, complier) - P(Y_i(0) = m | i \, is \, complier), \, m = 1, \dots, M.}
+
+\code{\link{causalQual_iv}} applies, for each class \code{m}, the standard two-stage least squares method to the binary variable \eqn{1(Y_i = m)}. Specifically, the routine first estimates
+the following first-stage regression model via OLS:
+
+\deqn{D_i = \gamma_0 + \gamma_1 Z_i + \nu_i,}
+
+and constructs the predicted values \eqn{\hat{D}_i}. It then uses these predicted values in the second-stage regressions:
+
+\deqn{1(Y_i = m) = \alpha_{m0} + \alpha_{m1} \hat{D}_i + \epsilon_{mi}, \quad m = 1, \dots, M.}
+
+The OLS estimate \eqn{\hat{\alpha}_{m1}} of \eqn{\alpha_{m1}} is then our estimate of \eqn{\delta_{m, L}}. Standard errors are computed using conventional procedures and used to construct
+conventional confidence intervals. All of this is done by calling the \code{\link[AER]{ivreg}} function.
+}
+\examples{
+\donttest{## Generate synthetic data.
+set.seed(1986)
+
+data <- generate_qualitative_data_iv(1000, outcome_type = "ordered")
+
+Y <- data$Y
+D <- data$D
+Z <- data$Z
+
+## Estimate local probabilities of shift.
+fit <- causalQual_iv(Y, D, Z)
+
+summary(fit)
+plot(fit)}
+
+}
+\seealso{
+\code{\link{causalQual_soo}} \code{\link{causalQual_rd}} \code{\link{causalQual_did}}
 }
 \author{
 Riccardo Di Francesco

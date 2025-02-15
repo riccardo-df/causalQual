@@ -1,11 +1,12 @@
 Package: causalQual
-Title: Causal inference with qualitative outcomes
+Title: Causal inference for qualitative outcomes
 Version: 0.0.0.9000
 Authors@R: 
     person("Riccardo", "Di Francesco", , "difrancesco.riccardo96@gmail.com", role = c("aut", "cre"))
-Description: Estimation strategies for causal parameters when the outcome is qualitative (e.g., mltinomial or ordered non-numeric). 'causalQual' implements
-    different estimators for the probability of shift and its conditional versions under selection-on-observables, instrumental
-    variables, difference-in-differences, and regression discontinuity research designs.
+Description: 'causalQual' provides a suite of tools for estimating causal effects when the outcome of interest is qualitative - i.e., multinomial or ordered. The package
+    implements the framework introduced in Di Francesco and Mellace (2025), shifting the focus to well-defined and interpretable estimands that quantify how treatment 
+    affects the probability distribution over outcome categories. It supports selection-on-observables, instrumental variables, regression discontinuity, and
+    difference-in-differences designs.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

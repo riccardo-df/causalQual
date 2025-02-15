@@ -1,12 +1,12 @@
 #' Summary Method for causalQual Objects
 #'
-#' Summarizes an \code{\link{causalQual}} object.
+#' Summarizes an \code{causalQual} object.
 #'
-#' @param object An \code{\link{causalQual}} object.
+#' @param object An \code{causalQual} object.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return
-#' Summarizes an \code{\link{causalQual}} object.
+#' Summarizes an \code{causalQual} object.
 #'
 #' @examples
 #' \donttest{## Generate synthetic data.
@@ -19,16 +19,14 @@
 #' X <- data$X
 #'
 #' ## Estimate probabilities of shifts.
-#' fit <- causalQual(Y = Y, D = D, X = X,
-#'                   identification = "selection_on_observables",
-#'                   outcome_type = "ordered")
+#' fit <- causalQual_soo(Y = Y, D = D, X = X, outcome_type = "ordered")
 #' summary(fit)}
 #'
 #' @import cli
 #'
 #' @author Riccardo Di Francesco
 #'
-#' @seealso \code{\link{causalQual}}
+#' @seealso causalQual
 #'
 #' @export
 summary.causalQual <- function(object, ...) {
@@ -94,14 +92,12 @@ summary.causalQual <- function(object, ...) {
 #' X <- data$X
 #'
 #' ## Estimate probabilities of shifts.
-#' fit <- causalQual(Y = Y, D = D, X = X,
-#'                   identification = "selection_on_observables",
-#'                   outcome_type = "ordered")
+#' fit <- causalQual_soo(Y = Y, D = D, X = X, outcome_type = "ordered")
 #' print(fit)}
 #'
 #' @author Riccardo Di Francesco
 #'
-#' @seealso \code{\link{causalQual}}
+#' @seealso causalQual
 #'
 #' @export
 print.causalQual <- function(x, ...) {
@@ -111,15 +107,16 @@ print.causalQual <- function(x, ...) {
 
 #' Plot Method for causalQual Objects
 #'
-#' Plots an \code{\link{causalQual}} object.
+#' Plots an \code{causalQual} object.
 #'
-#' @param x An \code{\link{causalQual}} object.
+#' @param x An \code{causalQual} object.
 #' @param hline Logical, whether to display an horizontal line at zero in the plot.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return
-#' Plots an \code{\link{causalQual}} object.
+#' Plots an causalQual object.
 #'
+#' @examples
 #' \donttest{## Generate synthetic data.
 #' set.seed(1986)
 #'
@@ -130,9 +127,7 @@ print.causalQual <- function(x, ...) {
 #' X <- data$X
 #'
 #' ## Estimate probabilities of shifts.
-#' fit <- causalQual(Y = Y, D = D, X = X,
-#'                   identification = "selection_on_observables",
-#'                   outcome_type = "ordered")
+#' fit <- causalQual_soo(Y = Y, D = D, X = X, outcome_type = "ordered")
 #' plot(fit)}
 #'
 #' @import ggplot2 ggsci
@@ -140,7 +135,7 @@ print.causalQual <- function(x, ...) {
 #'
 #' @author Riccardo Di Francesco
 #'
-#' @seealso \code{\link{causalQual}}
+#' @seealso causalQual
 #'
 #' @export
 plot.causalQual <- function(x, hline = TRUE, ...) {

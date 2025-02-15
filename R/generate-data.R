@@ -1,6 +1,6 @@
 #' Generate Qualitative Data (Selection-on-Observables)
 #'
-#' Generate a synthetic data set with qualitative outcomes for a selection-on-observables setting. The data include a binary treatment indicator and a matrix of covariates. The treatment is either
+#' Generate a synthetic data set with qualitative outcomes under a selection-on-observables design. The data include a binary treatment indicator and a matrix of covariates. The treatment is either
 #' independent or conditionally (on the covariates) independent of potential outcomes, depending on users' choices.
 #'
 #' @param n Sample size.
@@ -43,7 +43,7 @@
 #'
 #' ## Treatment assignment
 #' Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
-#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i2}) / 2}.
+#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i3}) / 2}.
 #'
 #' ## Other details
 #' The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.
@@ -53,7 +53,7 @@
 #'
 #' @author Riccardo Di Francesco
 #'
-#' @seealso \code{\link{causalQual}}
+#' @seealso \code{\link{generate_qualitative_data_iv}} \code{\link{generate_qualitative_data_rd}} \code{\link{generate_qualitative_data_did}}
 #'
 #' @export
 generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
@@ -138,7 +138,7 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
 
 #' Generate Qualitative Data (Instrumental Variables)
 #'
-#' Generate a synthetic data set with qualitative outcomes for an instrumental variables setting. The data include a binary treatment indicator and a binary instrument. Potential outcomes
+#' Generate a synthetic data set with qualitative outcomes under an instrumental variables design. The data include a binary treatment indicator and a binary instrument. Potential outcomes
 #' and potential treatments are independent of the instrument. Moreover, the instrument does not directly impact potential outcomes, has an impact on treatment probability, and can only increase the probability
 #' of treatment.
 #'
@@ -180,7 +180,7 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
 #'
 #' ## Treatment assignment and instrument
 #' The instrument is always generated as \eqn{Z_i \sim \text{Bernoulli}(0.5)}. Treatment is always modeled as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i, Z_i))}, with
-#' \eqn{\pi(X_i, Z_i) = P ( D_i = 1 | X_i, Z_i)) = (X_{i1} + X_{i2} + Z_i) / 3}. Thus, \eqn{Z_i} can increase the probability of treatment intake but cannot decrease it.
+#' \eqn{\pi(X_i, Z_i) = P ( D_i = 1 | X_i, Z_i)) = (X_{i1} + X_{i3} + Z_i) / 3}. Thus, \eqn{Z_i} can increase the probability of treatment intake but cannot decrease it.
 #'
 #' ## Other details
 #' The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.
@@ -190,7 +190,7 @@ generate_qualitative_data_soo <- function(n, assignment, outcome_type) {
 #'
 #' @author Riccardo Di Francesco
 #'
-#' @seealso \code{\link{causalQual}}
+#' @seealso \code{\link{generate_qualitative_data_soo}} \code{\link{generate_qualitative_data_rd}} \code{\link{generate_qualitative_data_did}}
 #'
 #' @export
 generate_qualitative_data_iv <- function(n, outcome_type) {
@@ -273,7 +273,7 @@ generate_qualitative_data_iv <- function(n, outcome_type) {
 
 #' Generate Qualitative Data (Difference-in-Differences)
 #'
-#' Generate a synthetic data set with qualitative outcomes for a difference-in-differences setting. The data include two time periods, a binary treatment indicator (applied only in the second period),
+#' Generate a synthetic data set with qualitative outcomes under a difference-in-differences design. The data include two time periods, a binary treatment indicator (applied only in the second period),
 #' and a matrix of covariates. Probabilities time shift among the treated and control groups evolve similarly across the two time periods (parallel trends on the probability mass functions).
 #'
 #' @param n Sample size.
@@ -307,7 +307,7 @@ generate_qualitative_data_iv <- function(n, outcome_type) {
 #'
 #' ## Treatment assignment
 #' Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
-#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i2}) / 2}.
+#' If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i3}) / 2}.
 #'
 #' ## Other details
 #' The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_{is}} are always constructed using the usual observational rule.
@@ -323,6 +323,11 @@ generate_qualitative_data_iv <- function(n, outcome_type) {
 #' data$pshifts_treated}
 #'
 #' @importFrom stats rbinom runif rnorm
+#'
+#' @author Riccardo Di Francesco
+#'
+#' @seealso \code{\link{generate_qualitative_data_soo}} \code{\link{generate_qualitative_data_iv}} \code{\link{generate_qualitative_data_rd}}
+#'
 #' @export
 generate_qualitative_data_did <- function(n, assignment, outcome_type) {
   ## 0.) Input validation
@@ -430,7 +435,7 @@ generate_qualitative_data_did <- function(n, assignment, outcome_type) {
 
 #' Generate Qualitative Data (Regression Discontinuity)
 #'
-#' Generate a synthetic data set with qualitative outcomes for a regression discontinuity setting. The data include a binary treatment indicator and a single covariate (the running variable). The conditional
+#' Generate a synthetic data set with qualitative outcomes under a regression discontinuity design. The data include a binary treatment indicator and a single covariate (the running variable). The conditional
 #' probability mass fuctions of potential outcomes are continuous in the running variable.
 #'
 #' @param n Sample size.
@@ -479,7 +484,7 @@ generate_qualitative_data_did <- function(n, assignment, outcome_type) {
 #'
 #' @author Riccardo Di Francesco
 #'
-#' @seealso \code{\link{causalQual}}
+#' @seealso \code{\link{generate_qualitative_data_soo}} \code{\link{generate_qualitative_data_iv}} \code{\link{generate_qualitative_data_did}}
 #'
 #' @export
 generate_qualitative_data_rd <- function(n, outcome_type) {
