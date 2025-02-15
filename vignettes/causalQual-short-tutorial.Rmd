@@ -45,7 +45,7 @@ Each function enables the estimation of well-defined and interpretable causal es
 - $p_m (d, x) := P ( Y_i = m | D_i = d, X_i = x )$ denotes the conditional probability of observing outcome category $m$ given treatment status $D_i = d$ and covariates $X_i = x$.
 - $\pi (x) := P ( D_i = 1 | X_i = x )$ represents the propensity score.
 
-## Selection-on-Observables
+## Selection-on-observables
 Selection-on-observables research designs are used to identify causal effects when units are observed at some point in time, some receive treatment, and we have data on pre-treatment characteristics and post-treatment outcomes. This approach is based on the following assumptions:
 
 - **Assumption 1** (*Unconfoundedness*): $Y_i(1), Y_i(0) ⊥ D_i | X_i$.
@@ -92,7 +92,7 @@ fit <- causalQual_soo(Y, D, X, outcome_type = "ordered")
 summary(fit)
 ```
 
-## Instrumental Variables
+## Instrumental variables
 In some applications, the observed covariates $X_i$ may not fully account for selection into treatment, making a selection-on-observables design unsuitable. Instrumental variables (IV) designs provide a popular identification strategy to address this issue. The key idea behind IV is to exploit a variable -- an instrument -- that is as good as randomly assigned, influences treatment assignment, but has no direct effect on the outcome except through treatment. This exogenous source of variation enables the identification of causal effects by isolating changes in treatment status that are not driven by unobserved factors.
 
 Formally, IV designs rely on the following assumptions.
@@ -137,7 +137,7 @@ fit <- causalQual_iv(Y, D, Z)
 summary(fit)
 ```
 
-## Regression Discontinuity
+## Regression discontinuity
 Regression Discontinuity designs are employed to identify causal effects when treatment assignment is determined by whether a continuous variable crosses a known threshold or cutoff. The key assumption is that units just above and just below the cutoff are comparable, meaning that any discontinuity in outcomes at the threshold can be attributed to the treatment rather than to pre-existing differences.
 
 In this section, we let $X_i$ be a single observed covariate (rather than a vector of covariates) and we call it \open running variable." By construction, $X_i$ fully determines treatment assignment. Specifically, units receive treatment if and only if their running variable exceeds a predetermined threshold $c$. Thus, $D_i = 1(X_i \geq c)$.
@@ -174,7 +174,7 @@ fit <- causalQual_rd(Y, running_variable, cutoff)
 summary(fit)
 ```
 
-## Difference-in-Differences
+## Difference-in-differences
 Difference-in-Differences designs are employed to identify causal effects when units are observed over time and treatment is introduced only from a certain point onward for some units. The key assumption is that, in the absence of treatment, the change in outcomes for treated units would have mirrored the change observed in the control group.
 
 For our identification purporses, we introduce the following assumption.
