@@ -42,7 +42,7 @@ devtools::install_github("riccardo-df/causalQual")
 We welcome contributions! If you encounter issues, have feature requests, or want to contribute to the package, please follow the guidelines below.
 
 📌 **Report an issue:** If you encounter a bug or have a suggestion, please open an issue on GitHub:
-[Submit an Issue](https://github.com/riccardo-df/causalQual/issues)
+[Submit an issue](https://github.com/riccardo-df/causalQual/issues)
 
 📌 **Contribute code:** We encourage contributions via pull requests. Before submitting, please:
 1. Fork the repository and create a new branch.
