@@ -1,8 +1,6 @@
 # Causal inference for qualitative outcomes <a href="https://riccardo-df.github.io/causalQual/"><img src="man/figures/logo.svg" align="right" height="130"/></a>
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CRAN](https://www.r-pkg.org/badges/version/causalQual)](https://CRAN.R-project.org/package=causalQual) [![Downloads](https://cranlogs.r-pkg.org/badges/causalQual)](https://CRAN.R-project.org/package=causalQual)
-
-## Overview
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CRAN](https://www.r-pkg.org/badges/version/causalQual)](https://CRAN.R-project.org/package=causalQual) [![Downloads](https://cranlogs.r-pkg.org/badges/causalQual)](https://CRAN.R-project.org/package=causalQual) 
 
 The `causalQual` package provides a suite of tools for estimating causal effects when the outcome of interest is qualitative - i.e., multinomial or ordered. Standard causal inference methods such as instrumental variables (IV), regression discontinuity (RD), and difference-in-differences (DiD) are typically designed for numeric outcomes. Their direct application to qualitative outcomes leads to ill-defined estimands, rendering results arbitrary and uninterpretable.
 
