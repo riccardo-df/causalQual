@@ -13,22 +13,15 @@ This package implements the framework introduced in Di Francesco and Mellace (20
 ## Why Use `causalQual`?
 
 | Feature                             | Benefit                                                                                                                                        |
-|-----------------|-------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | **Avoids misleading conclusions**   | Conventional estimands are often undefined or depend on arbitrary outcome coding. `causalQual` targets interpretable and meaningful estimands. |
 | **Provides well-defined estimands** | Instead of relying on average effects, `causalQual` models how treatment shifts probabilities over outcome categories.                         |
+| **Wide applicability**              | Supports selection-on-observables, IV, RD, and DiD.                                                                                            |
 | **Extensible and open-source**      | Actively developed with planned support for staggered adoption, fuzzy regression discontinuity, and more.                                      |
 
 ------------------------------------------------------------------------
 
-## Key Features
-
-✔ **Implements causal inference methods for qualitative outcomes**\
-✔ **Supports selection-on-observables, IV, RD, DiD**\
-✔ **Open-source and extensible**
-
-------------------------------------------------------------------------
-
-## Installation
+## 🚀 Installation
 
 To install the latest stable release from CRAN, run:
 
@@ -36,22 +29,11 @@ To install the latest stable release from CRAN, run:
 install.packages("causalQual")
 ```
 
-To install the latest development version from GitHub, run:
+Alternatively, the current development version of the package can be installed using the `devtools` package:
 
 ```         
 devtools::install_github("riccardo-df/causalQual")
 ```
-
-------------------------------------------------------------------------
-
-## Functionality
-
-| Identification strategy       | Function           |
-|-------------------------------|--------------------|
-| **Selection-on-Observables**  | `causalQual_soo()` |
-| **Instrumental Variables**    | `causalQual_iv()`  |
-| **Regression Discontinuity**  | `causalQual_rd()`  |
-| **Difference-in-Differences** | `causalQual_did()` |
 
 ------------------------------------------------------------------------
 
