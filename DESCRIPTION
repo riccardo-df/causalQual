@@ -1,6 +1,6 @@
 Package: causalQual
 Title: Causal inference for qualitative outcomes
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person("Riccardo", "Di Francesco", , "difrancesco.riccardo96@gmail.com", role = c("aut", "cre"))
 Description: 'causalQual' provides a suite of tools for estimating causal effects when the outcome of interest is qualitative - i.e., multinomial or ordered. The package
