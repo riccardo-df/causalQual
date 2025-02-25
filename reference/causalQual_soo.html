@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">causalQual</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -116,6 +116,12 @@ as base learners. Else, if <code>outcome_type == "ordered"</code>, \(\hat{P}(Y_i
 <p>Folds are created by random split. If some class of <code>Y</code> is not observed in one or more folds for one or both treatment groups, a new random partition is performed. This process is repeat until when all
 classes are observed in all folds and for all treatment groups up to 1000 times, after which the routine raises an error.</p>
     </div>
+    <div id="references">
+    <h2>References</h2>
+
+<ul><li><p>Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. <a href="https://doi.org/10.48550/arXiv.2502.11691" class="external-link">doi:10.48550/arXiv.2502.11691</a>
+.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="causalQual_iv.html">causalQual_iv</a></code> <code><a href="causalQual_rd.html">causalQual_rd</a></code> <code><a href="causalQual_did.html">causalQual_did</a></code></p></div>
@@ -130,7 +136,7 @@ classes are observed in all folds and for all treatment groups up to 1000 times,
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Generate synthetic data.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1986</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_qualitative_data_soo.html">generate_qualitative_data_soo</a></span><span class="op">(</span><span class="fl">1000</span>, assignment <span class="op">=</span> <span class="st">"observational"</span>,</span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_qualitative_data_soo.html">generate_qualitative_data_soo</a></span><span class="op">(</span><span class="fl">200</span>, assignment <span class="op">=</span> <span class="st">"observational"</span>,</span></span>
 <span class="r-in"><span>                                      outcome_type <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">Y</span></span></span>
 <span class="r-in"><span><span class="va">D</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">D</span></span></span>
@@ -149,14 +155,14 @@ classes are observed in all folds and for all treatment groups up to 1000 times,
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimand:                Probability Shifts </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome type:            ordered </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Classes:                 1 2 3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N. units:                1000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fraction treated units:  0.516 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N. units:                200 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fraction treated units:  0.44 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Point estimates and 95\% confidence intervals</span> ──</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 1: -0.556  [-0.614, -0.498]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 2: -0.036  [-0.096,  0.025]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 3:  0.592  [ 0.538,  0.646]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 1: -0.574  [-0.689, -0.459]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 2:  0.039  [-0.081,  0.158]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 3:  0.536  [ 0.415,  0.656]</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="causalQual_soo-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

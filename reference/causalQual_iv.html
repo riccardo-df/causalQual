@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">causalQual</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -90,6 +90,12 @@ the following first-stage regression model via OLS:</p>
 <p>The OLS estimate \(\hat{\alpha}_{m1}\) of \(\alpha_{m1}\) is then our estimate of \(\delta_{m, L}\). Standard errors are computed using conventional procedures and used to construct
 conventional confidence intervals. All of this is done by calling the <code><a href="https://rdrr.io/pkg/AER/man/ivreg.html" class="external-link">ivreg</a></code> function.</p>
     </div>
+    <div id="references">
+    <h2>References</h2>
+
+<ul><li><p>Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. <a href="https://doi.org/10.48550/arXiv.2502.11691" class="external-link">doi:10.48550/arXiv.2502.11691</a>
+.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="causalQual_soo.html">causalQual_soo</a></code> <code><a href="causalQual_rd.html">causalQual_rd</a></code> <code><a href="causalQual_did.html">causalQual_did</a></code></p></div>
@@ -104,7 +110,7 @@ conventional confidence intervals. All of this is done by calling the <code><a h
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Generate synthetic data.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1986</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_qualitative_data_iv.html">generate_qualitative_data_iv</a></span><span class="op">(</span><span class="fl">1000</span>, outcome_type <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_qualitative_data_iv.html">generate_qualitative_data_iv</a></span><span class="op">(</span><span class="fl">100</span>, outcome_type <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">Y</span></span></span>
 <span class="r-in"><span><span class="va">D</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">D</span></span></span>
@@ -123,14 +129,14 @@ conventional confidence intervals. All of this is done by calling the <code><a h
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimand:                Local Probability Shifts </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome type:            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Classes:                 1 2 3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N. units:                1000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fraction treated units:  0.498 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N. units:                100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fraction treated units:  0.53 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Point estimates and 95\% confidence intervals</span> ──</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 1: -0.673  [-0.806, -0.539]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 2:  0.028  [-0.113,  0.169]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 3:  0.644  [ 0.512,  0.776]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 1: -0.712  [-1.110, -0.313]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 2:  0.061  [-0.447,  0.568]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 3:  0.651  [ 0.164,  1.139]</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="causalQual_iv-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

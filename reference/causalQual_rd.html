@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">causalQual</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -84,6 +84,12 @@ we can recover the probability shift at the cutoff for class \(m\):</p>
 <p><code>causalQual_rd</code> applies, for each class \(m\), standard local polynomial estimators to the binary variable \(1(Y_i = m)\). Specifically, the ruotine implements the
 robust bias-corrected inference procedure of Calonico et al. (2014) (see the <code><a href="https://rdrr.io/pkg/rdrobust/man/rdrobust.html" class="external-link">rdrobust</a></code> function).</p>
     </div>
+    <div id="references">
+    <h2>References</h2>
+
+<ul><li><p>Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. <a href="https://doi.org/10.48550/arXiv.2502.11691" class="external-link">doi:10.48550/arXiv.2502.11691</a>
+.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="causalQual_soo.html">causalQual_soo</a></code> <code><a href="causalQual_iv.html">causalQual_iv</a></code> <code><a href="causalQual_did.html">causalQual_did</a></code></p></div>
@@ -98,7 +104,7 @@ robust bias-corrected inference procedure of Calonico et al. (2014) (see the <co
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Generate synthetic data.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1986</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_qualitative_data_rd.html">generate_qualitative_data_rd</a></span><span class="op">(</span><span class="fl">1000</span>, outcome_type <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_qualitative_data_rd.html">generate_qualitative_data_rd</a></span><span class="op">(</span><span class="fl">100</span>, outcome_type <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">Y</span></span></span>
 <span class="r-in"><span><span class="va">running_variable</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">running_variable</span></span></span>
@@ -117,14 +123,14 @@ robust bias-corrected inference procedure of Calonico et al. (2014) (see the <co
 <span class="r-out co"><span class="r-pr">#&gt;</span> Estimand:                Probability Shifts at the Cutoff </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome type:            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Classes:                 1 2 3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N. units:                1000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fraction treated units:  0.519 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N. units:                100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fraction treated units:  0.51 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Point estimates and 95\% confidence intervals</span> ──</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 1: -0.840  [-1.051, -0.628]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 2: -0.006  [-0.193,  0.181]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Class 3:  0.981  [ 0.737,  1.226]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 1: -1.210  [-1.676, -0.744]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 2: -0.075  [-0.145, -0.006]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Class 3:  1.281  [ 0.811,  1.750]</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="causalQual_rd-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
