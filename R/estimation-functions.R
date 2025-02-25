@@ -14,7 +14,7 @@
 #' \donttest{## Generate synthetic data.
 #' set.seed(1986)
 #'
-#' data <- generate_qualitative_data_soo(1000, assignment = "observational",
+#' data <- generate_qualitative_data_soo(200, assignment = "observational",
 #'                                       outcome_type = "ordered")
 #' Y <- data$Y
 #' D <- data$D
@@ -73,6 +73,11 @@
 #' @author Riccardo Di Francesco
 #'
 #' @seealso \code{\link{causalQual_iv}} \code{\link{causalQual_rd}} \code{\link{causalQual_did}}
+#'
+#' @references
+#' \itemize{
+#'   \item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+#' }
 #'
 #' @export
 causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
@@ -183,10 +188,10 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
 #' @return An object of class \code{causalQual}.
 #'
 #' @examples
-#' \donttest{## Generate synthetic data.
+#' ## Generate synthetic data.
 #' set.seed(1986)
 #'
-#' data <- generate_qualitative_data_iv(1000, outcome_type = "ordered")
+#' data <- generate_qualitative_data_iv(100, outcome_type = "ordered")
 #'
 #' Y <- data$Y
 #' D <- data$D
@@ -196,7 +201,7 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
 #' fit <- causalQual_iv(Y, D, Z)
 #'
 #' summary(fit)
-#' plot(fit)}
+#' plot(fit)
 #'
 #' @details
 #' Under an instrumental-variables design, identification requires the instrument to be independent of potential outcomes and potential treatments (exogeneity), that the
@@ -222,6 +227,11 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
 #' @author Riccardo Di Francesco
 #'
 #' @seealso \code{\link{causalQual_soo}} \code{\link{causalQual_rd}} \code{\link{causalQual_did}}
+#'
+#' @references
+#' \itemize{
+#'   \item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+#' }
 #'
 #' @export
 causalQual_iv <- function(Y, D, Z) {
@@ -276,10 +286,10 @@ causalQual_iv <- function(Y, D, Z) {
 #' @return An object of class \code{causalQual}.
 #'
 #' @examples
-#' \donttest{## Generate synthetic data.
+#' ## Generate synthetic data.
 #' set.seed(1986)
 #'
-#' data <- generate_qualitative_data_did(1000, assignment = "observational",
+#' data <- generate_qualitative_data_did(100, assignment = "observational",
 #'                                       outcome_type = "ordered")
 #'
 #' Y_pre <- data$Y_pre
@@ -290,7 +300,7 @@ causalQual_iv <- function(Y, D, Z) {
 #' fit <- causalQual_did(Y_pre, Y_post, D)
 #'
 #' summary(fit)
-#' plot(fit)}
+#' plot(fit)
 #'
 #' @details
 #' Under a difference-in-difference design, identification requires that the probabilities time shift for \eqn{Y_{is} (0)} for class \eqn{m} evolve similarly for the treated and control groups (parallel
@@ -314,6 +324,11 @@ causalQual_iv <- function(Y, D, Z) {
 #' @author Riccardo Di Francesco
 #'
 #' @seealso \code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_rd}}
+#'
+#' @references
+#' \itemize{
+#'   \item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+#' }
 #'
 #' @export
 causalQual_did <- function(Y_pre, Y_post, D) {
@@ -380,10 +395,10 @@ causalQual_did <- function(Y_pre, Y_post, D) {
 #' @return An object of class \code{causalQual}.
 #'
 #' @examples
-#' \donttest{## Generate synthetic data.
+#' ## Generate synthetic data.
 #' set.seed(1986)
 #'
-#' data <- generate_qualitative_data_rd(1000, outcome_type = "ordered")
+#' data <- generate_qualitative_data_rd(100, outcome_type = "ordered")
 #'
 #' Y <- data$Y
 #' running_variable <- data$running_variable
@@ -393,7 +408,7 @@ causalQual_did <- function(Y_pre, Y_post, D) {
 #' fit <- causalQual_rd(Y, running_variable, cutoff)
 #'
 #' summary(fit)
-#' plot(fit)}
+#' plot(fit)
 #'
 #' @details
 #' Under a regression discontinuity design, identification requires that the probability mass functions for class \eqn{m} of potential outcomes are continuous in the running variable (continuity). If this assumption holds,
@@ -409,6 +424,11 @@ causalQual_did <- function(Y_pre, Y_post, D) {
 #' @author Riccardo Di Francesco
 #'
 #' @seealso \code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_did}}
+#'
+#' @references
+#' \itemize{
+#'   \item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+#' }
 #'
 #' @export
 causalQual_rd <- function(Y, running_variable, cutoff) {

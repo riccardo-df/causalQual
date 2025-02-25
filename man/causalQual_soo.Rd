@@ -67,7 +67,7 @@ classes are observed in all folds and for all treatment groups up to 1000 times,
 \donttest{## Generate synthetic data.
 set.seed(1986)
 
-data <- generate_qualitative_data_soo(1000, assignment = "observational",
+data <- generate_qualitative_data_soo(200, assignment = "observational",
                                       outcome_type = "ordered")
 Y <- data$Y
 D <- data$D
@@ -79,6 +79,11 @@ fit <- causalQual_soo(Y, D, X, outcome_type = "ordered", K = 2)
 summary(fit)
 plot(fit)}
 
+}
+\references{
+\itemize{
+\item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+}
 }
 \seealso{
 \code{\link{causalQual_iv}} \code{\link{causalQual_rd}} \code{\link{causalQual_did}}

@@ -34,10 +34,10 @@ The OLS estimate \eqn{\hat{\beta}_{m3}} of \eqn{\beta_{m3}} is our estimate of t
 conventional confidence intervals.
 }
 \examples{
-\donttest{## Generate synthetic data.
+## Generate synthetic data.
 set.seed(1986)
 
-data <- generate_qualitative_data_did(1000, assignment = "observational",
+data <- generate_qualitative_data_did(100, assignment = "observational",
                                       outcome_type = "ordered")
 
 Y_pre <- data$Y_pre
@@ -48,8 +48,13 @@ D <- data$D
 fit <- causalQual_did(Y_pre, Y_post, D)
 
 summary(fit)
-plot(fit)}
+plot(fit)
 
+}
+\references{
+\itemize{
+\item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+}
 }
 \seealso{
 \code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_rd}}

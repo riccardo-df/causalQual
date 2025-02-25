@@ -39,10 +39,10 @@ The OLS estimate \eqn{\hat{\alpha}_{m1}} of \eqn{\alpha_{m1}} is then our estima
 conventional confidence intervals. All of this is done by calling the \code{\link[AER]{ivreg}} function.
 }
 \examples{
-\donttest{## Generate synthetic data.
+## Generate synthetic data.
 set.seed(1986)
 
-data <- generate_qualitative_data_iv(1000, outcome_type = "ordered")
+data <- generate_qualitative_data_iv(100, outcome_type = "ordered")
 
 Y <- data$Y
 D <- data$D
@@ -52,8 +52,13 @@ Z <- data$Z
 fit <- causalQual_iv(Y, D, Z)
 
 summary(fit)
-plot(fit)}
+plot(fit)
 
+}
+\references{
+\itemize{
+\item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+}
 }
 \seealso{
 \code{\link{causalQual_soo}} \code{\link{causalQual_rd}} \code{\link{causalQual_did}}

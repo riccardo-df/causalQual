@@ -29,10 +29,10 @@ we can recover the probability shift at the cutoff for class \eqn{m}:
 robust bias-corrected inference procedure of Calonico et al. (2014) (see the \code{\link[rdrobust]{rdrobust}} function).
 }
 \examples{
-\donttest{## Generate synthetic data.
+## Generate synthetic data.
 set.seed(1986)
 
-data <- generate_qualitative_data_rd(1000, outcome_type = "ordered")
+data <- generate_qualitative_data_rd(100, outcome_type = "ordered")
 
 Y <- data$Y
 running_variable <- data$running_variable
@@ -42,8 +42,13 @@ cutoff <- data$cutoff
 fit <- causalQual_rd(Y, running_variable, cutoff)
 
 summary(fit)
-plot(fit)}
+plot(fit)
 
+}
+\references{
+\itemize{
+\item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+}
 }
 \seealso{
 \code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_did}}
