@@ -56,4 +56,4 @@ We welcome contributions! If you encounter issues, have feature requests, or wan
 
 If you use `causalQual` in your research, please cite the corresponding paper:
 
-> **Di Francesco, R. & Mellace, G. (2025)** *Causal Inference for Qualitative Outcomes.* arXiv preprint arXiv:2502.11691.
+> **Di Francesco, R. & Mellace, G. (2025).** *Causal Inference for Qualitative Outcomes.* arXiv preprint arXiv:2502.11691.
