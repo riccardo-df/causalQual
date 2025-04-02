@@ -71,7 +71,8 @@
 <a class="anchor" aria-label="anchor" href="#causal-inference-for-qualitative-outcomes-"></a>
 </h1></div>
 <p><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a> <a href="https://CRAN.R-project.org/package=causalQual" class="external-link"><img src="https://www.r-pkg.org/badges/version/causalQual" alt="CRAN"></a> <a href="https://CRAN.R-project.org/package=causalQual" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/causalQual" alt="Downloads"></a></p>
-<p>The <code>causalQual</code> package provides a suite of tools for estimating causal effects when the outcome of interest is qualitative - i.e., multinomial or ordered. Standard causal inference methods such as instrumental variables (IV), regression discontinuity (RD), and difference-in-differences (DiD) are typically designed for numeric outcomes. Their direct application to qualitative outcomes leads to ill-defined estimands, rendering results arbitrary and uninterpretable.</p>
+<p>The <code>causalQual</code> package provides a suite of tools for estimating causal effects when the outcome targeted by the treatment is qualitative - i.e., multinomial or ordered.</p>
+<p>Standard causal inference methods such as instrumental variables (IV), regression discontinuity (RD), and difference-in-differences (DiD) are typically designed for numeric outcomes. Their direct application to qualitative outcomes leads to ill-defined estimands, rendering results arbitrary and uninterpretable.</p>
 <p>This package implements the framework introduced in Di Francesco and Mellace (2025), shifting the focus to well-defined and interpretable estimands that quantify how treatment affects the probability distribution over outcome categories. The methods remain compatible with conventional research designs, ensuring ease of implementation for applied researchers.</p>
 <hr>
 <div class="section level2">
@@ -79,8 +80,8 @@
 </h2>
 <table class="table">
 <colgroup>
-<col width="26%">
-<col width="73%">
+<col width="27%">
+<col width="72%">
 </colgroup>
 <thead><tr class="header">
 <th>Feature</th>

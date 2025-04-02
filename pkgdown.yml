@@ -3,7 +3,8 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   causalQual-short-tutorial: causalQual-short-tutorial.html
-last_built: 2025-03-20T14:15Z
+  causalQual-simulation-staggeredDID: causalQual-simulation-staggeredDID.html
+last_built: 2025-04-02T11:16Z
 urls:
   reference: https://riccardo-df.github.io/causalQual/reference
   article: https://riccardo-df.github.io/causalQual/articles
