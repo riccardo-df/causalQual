@@ -51,9 +51,9 @@ summary.causalQual <- function(object, ...) {
   cat("Estimand:               ", estimand, "\n")
   cat("Outcome type:           ", object$outcome_type, "\n")
   cat("Classes:                ", sort(unique(object$data$Y)), "\n")
-  cat("N. units:               ", length(object$data$D), "\n")
+  if (object$identification == "diff_in_diff") cat("N. units:               ", length(object$data$D) / length(unique(object$data$time)), "\n") else cat("N. units:               ", length(object$data$D), "\n")
   cat("Fraction treated units: ", mean(object$data$D), "\n\n")
-  cat("")
+  cat("\n")
   cli::cli_h2("Point estimates and 95\\% confidence intervals")
   estimates <- object$estimates
   estimates <- format(round(estimates, 3), nsmall = 3)

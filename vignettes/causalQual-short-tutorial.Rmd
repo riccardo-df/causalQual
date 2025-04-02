@@ -228,9 +228,10 @@ For illustration, we generate a synthetic data set using the `generate_qualitati
 n <- 2000
 data <- generate_qualitative_data_did(n, assignment = "observational", outcome_type = "ordered")
 
-Y_pre <- data$Y_pre
-Y_post <- data$Y_post
+Y <- data$Y
 D <- data$D
+unit_id <- data$unit_id
+time <- data$time
 ```
 
 Once the data set is generated, we use `causalQual_did` to estimate the PST for each outcome category. This function performs estimation by applying the canonical two-group/two-period DiD method to the binary variable $1(Y_i = m)$. Specifically, consider the following linear regression model:
@@ -243,7 +244,7 @@ As before, `causalQual_did` returns an object of class `causalQual` compatible w
 
 ```{r, fig.dim=c(5, 3)}
 ## Estimation.
-fit <- causalQual_did(Y_pre, Y_post, D)
+fit <- causalQual_did(Y, D, unit_id, time)
 ```
 
 ```{r, fig.dim=c(5, 3)}

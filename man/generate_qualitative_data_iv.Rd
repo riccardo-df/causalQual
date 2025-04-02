@@ -51,7 +51,9 @@ The instrument is always generated as \eqn{Z_i \sim \text{Bernoulli}(0.5)}. Trea
 
 \subsection{Other details}{
 
-The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.
+The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.\cr
+
+The DGPs outlined above ensure that \eqn{Z_i} is a valid instrument for \code{D_i}.
 }
 }
 \examples{

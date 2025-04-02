@@ -4,22 +4,13 @@
 \alias{generate_qualitative_data_did}
 \title{Generate Qualitative Data (Difference-in-Differences)}
 \usage{
-generate_qualitative_data_did(
-  n,
-  time_periods = 2,
-  assignment,
-  assignment_type = "block",
-  outcome_type
-)
+generate_qualitative_data_did(n, assignment, outcome_type)
 }
 \arguments{
 \item{n}{Sample size.}
 
-\item{time_periods}{Controls how many time periods are generated.}
-
-\item{assignment}{String controlling treatment assignment. Must be either \code{"randomized"} (random assignment) or \code{"observational"} (assignment based on covariates).}
-
-\item{assignment_type}{String controlling the type of assignment timing. Must be either \code{"block"} (all treated units get treatment at the same time period) or \code{"staggered"} (units receive treatment at different time periods).}
+\item{assignment}{String controlling treatment assignment. Must be either \code{"randomized"} (random assignment)
+or \code{"observational"} (assignment based on covariates).}
 
 \item{outcome_type}{String controlling the outcome type. Must be either \code{"multinomial"} or \code{"ordered"}.}
 }
@@ -51,18 +42,13 @@ with \eqn{\tau = 2}. It then constructs \eqn{Y_i (d, s)} by discretizing \eqn{Y_
 
 \deqn{P(Y_i(d, s) = m | X_i) = P(\zeta_{m-1} < Y_i^*(d, s) \leq \zeta_m | X_i) = \Phi (\zeta_m - \sum_j X_{ij} - \tau d) - \Phi (\zeta_{m-1} - \sum_j X_{ij} - \tau d), \quad d = 0, 1, \quad s = t-1, t,}
 
-which allows us to analytically compute the probabilities of shift on the treated for each group (determined by timing of treatment) at each time after treatment occurs for that group.\cr
-
-Notice that, by design, the probabilities of shift on the treated of each group are constant over time. However, effects can vary across groups due to variation in covariate distributions.
+which allows us to analytically compute the probabilities of shift on the treated.
 }
 
 \subsection{Treatment assignment}{
 
 Treatment is always assigned as \eqn{D_i \sim \text{Bernoulli}(\pi(X_i))}. If \code{assignment == "randomized"}, then the propensity score is specified as \eqn{\pi(X_i) = P ( D_i = 1 | X_i)) = 0.5}.
-If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i3}) / 2}.\cr
-
-If \code{assignment_type == "block"}, then all treated units receive treatment at time \code{ceiling(time_periods / 2)}. If instead \code{assignment_type == "staggered"}, then the routine samples
-the treatment date among \code{2:(time_periods-1)} for treated units (essentially, each treated unit is equally likely to be treated at one date between the second and the second-to-last time period).
+If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + X_{i3}) / 2}.
 }
 
 \subsection{Other details}{
@@ -75,9 +61,7 @@ The function always generates three independent covariates from \eqn{U(0,1)}. Ob
 set.seed(1986)
 
 data <- generate_qualitative_data_did(100,
-                                      time_periods = 5,
                                       assignment = "observational",
-                                      assignment_type = "staggered",
                                       outcome_type = "ordered")
 
 data$pshifts_treated}

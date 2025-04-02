@@ -4,7 +4,7 @@
 \alias{causalQual_did}
 \title{Causal Inference for Qualitative Outcomes under Difference-in-Differences}
 \usage{
-causalQual_did(Y, D, unit_id, time, treatment_start, estimator = "CS")
+causalQual_did(Y, D, unit_id, time)
 }
 \arguments{
 \item{Y}{Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.}

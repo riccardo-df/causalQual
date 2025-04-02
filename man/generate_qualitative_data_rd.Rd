@@ -49,7 +49,9 @@ Treatment is always assigned as \eqn{D_i = 1(X_i \geq 0.5)}.
 
 \subsection{Other details}{
 
-The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.
+The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.\cr
+
+The DGPs outlined above ensure identification under a standard regression discontinuity design.
 }
 }
 \examples{

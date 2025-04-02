@@ -52,7 +52,9 @@ If instead \code{assignment == "observational"}, then \eqn{\pi(X_i) = (X_{i1} + 
 
 \subsection{Other details}{
 
-The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.
+The function always generates three independent covariates from \eqn{U(0,1)}. Observed outcomes \eqn{Y_i} are always constructed using the usual observational rule.\cr
+
+Controlling for \eqn{X_{i1}} and \eqn{X_{i3}} is sufficient for selection-on-observables to hold.
 }
 }
 \examples{

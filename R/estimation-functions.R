@@ -423,7 +423,7 @@ causalQual_did <- function(Y, D, unit_id, time) {
   if (length(unique(time)) < 2) stop("We need at least two time periods (i.e., two unique values of 'time').", call. = FALSE)
 
   classes <- sort(unique(Y))
-  data <- data.frame(Y = Y, D = D, id = unit_id, time = time, treatment_start = treatment_start)
+  data <- data.frame(Y = Y, D = D, id = unit_id, time = time)
 
   ## 1.) Fit models. Then construct conventional confidence intervals.
   fits <- list()
@@ -457,69 +457,3 @@ causalQual_did <- function(Y, D, unit_id, time) {
   class(output) <- "causalQual"
   return(output)
 }
-# causalQual_did <- function(Y, D, unit_id, time, treatment_start, estimator = "CS", ...) {
-#   ## 0.) Handle inputs and checks.
-#   if (!all(sort(unique(Y)) == seq_len(max(Y)))) stop("Invalid 'Y'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
-#   if (!(estimator %in% c("TGTP", "CS"))) stop("Invalid 'estimator'. Must be either 'TGTP' (two-group/two-period) or CS (Callaway & Sant'Anna, 2021).", call. = FALSE)
-#   if (length(unique(time)) < 2) stop("We need at least two time periods (i.e., two unique values of 'time').", call. = FALSE)
-#   if (length(unique(time)) & estimator == "TGTP") stop("The 'TGTP' (two-group/two-period) estimator can be employed only if we have just two time periods.", call. = FALSE)
-#
-#   classes <- sort(unique(Y))
-#   data <- data.frame(Y = Y, D = D, id = unit_id, time = time, treatment_start = treatment_start)
-#
-#   ## 1.) Estimation. Implement the chosen estimator.
-#   if (estimator == "TGTP") {
-#     ## Fit models. Then construct conventional confidence intervals.
-#     fits <- list()
-#     pshifts_treated_hat <- numeric(length(classes))
-#     pshifts_treated_hat_se <- numeric(length(classes))
-#
-#     for (m in classes) {
-#       data$indicator <- as.numeric(Y == m)
-#       fit <- stats::lm(indicator ~ D*time, data = data)
-#       cluster_se <- lmtest::coeftest(fit, vcov = sandwich::vcovCL(fit, cluster = ~ unit_id, type = "HC0"))
-#
-#       fits[[paste0("Class_", m)]] <- fit
-#       pshifts_treated_hat[m] <- coef(fit)["D:time"]
-#       pshifts_treated_hat_se[m] <- cluster_se["D:time", 2]
-#     }
-#
-#     cis_lower <- pshifts_treated_hat - 1.96 * pshifts_treated_hat_se
-#     cis_upper <- pshifts_treated_hat + 1.96 * pshifts_treated_hat_se
-#   } else if (estimator == "CS") {
-#     fits <- list()
-#     pshifts_treated_hat <- numeric(length(classes))
-#     pshifts_treated_hat_se <- numeric(length(classes))
-#
-#     for (m in classes) {
-#       data$indicator <- as.numeric(Y == m)
-#
-#       fit <- did::att_gt(yname = "indicator",
-#                          tname = "time",
-#                          idname = "id",
-#                          gname = "treatment_start",
-#                          data = data,
-#                          ...)
-#
-#       fits[[paste0("Class_", m)]] <- fit
-#       # pshifts_treated_hat[m] <- summary_attgt$overall.att
-#       # pshifts_treated_hat_se[m] <- summary_attgt$overall.se
-#     }
-#   }
-#
-#
-#
-#   ## 2.) Output.
-#   output <- list()
-#   output$identification <- "diff_in_diff"
-#   output$outcome_type <- NULL
-#   output$estimates <- pshifts_treated_hat
-#   output$standard_errors <- pshifts_treated_hat_se
-#   # output$confidence_intervals <- list("lower" = cis_lower, "upper" = cis_upper)
-#   output$dr_scores <- NULL
-#   output$fits <- fits
-#   output$data <- list("Y" = Y, "D" = D, "unit_id" = unit_id, "time" = time, "X" = NULL, "Z" = NULL, "running_variable" = NULL, "cutoff" = NULL)
-#
-#   class(output) <- "causalQual"
-#   return(output)
-# }
