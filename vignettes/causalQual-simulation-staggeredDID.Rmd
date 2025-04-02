@@ -1,0 +1,26 @@
+---
+title: "Extensions and simulation evidence: Staggered DiD"
+author: "Riccardo Di Francesco"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extensions and simulation evidence: Staggered DiD}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ">"
+)
+
+library(causalQual)
+
+options(cli.num_colors = 1)
+
+set.seed(1986)
+```
+
+## Introduction
+This vignette provides an overview of an extension of the `causalQual_did()` to staggered assignments.
+

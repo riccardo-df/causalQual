@@ -1,7 +1,5 @@
 #' Causal Inference for Qualitative Outcomes under Selection-on-Observables
 #'
-#' Construct and average doubly robust scores for qualitative outcomes to estimate the probabilities of shift.
-#'
 #' @param Y Qualitative outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.
 #' @param D Binary treatment indicator.
 #' @param X Covariate matrix (no intercept).
@@ -170,7 +168,7 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
   output$confidence_intervals <- list("lower" = cis_lower, "upper" = cis_upper)
   output$dr_scores <- gammas
   output$fits <- NULL
-  output$data <- list("Y" = Y, "Y_pre" = NULL, "Y_post" = NULL, "D" = D, "X" = X, "Z" = NULL, "running_variable" = NULL, "cutoff" = NULL)
+  output$data <- list("Y" = Y, "D" = D, "unit_id" = NULL, "time" = NULL, "X" = X, "Z" = NULL, "running_variable" = NULL, "cutoff" = NULL)
 
   class(output) <- "causalQual"
   return(output)
@@ -178,8 +176,6 @@ causalQual_soo <- function(Y, D, X, outcome_type, K = 5) {
 
 
 #' Causal Inference for Qualitative Outcomes under Instrumental Variables
-#'
-#' Fit two-stage least squares models for qualitative outcomes to estimate the local probabilities of shift.
 #'
 #' @param Y Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
 #' @param D Binary treatment indicator.
@@ -244,8 +240,8 @@ causalQual_iv <- function(Y, D, Z) {
 
   ## 1.) Fit models. Then construct conventional confidence intervals.
   fits <- list()
-  local_pshifts_hat <- numeric()
-  local_pshifts_hat_se <- numeric()
+  local_pshifts_hat <- numeric(length(classes))
+  local_pshifts_hat_se <- numeric(length(classes))
 
   for (m in classes) {
     data$indicator <- as.numeric(Y == m)
@@ -268,116 +264,7 @@ causalQual_iv <- function(Y, D, Z) {
   output$confidence_intervals <- list("lower" = cis_lower, "upper" = cis_upper)
   output$dr_scores <- NULL
   output$fits <- fits
-  output$data <- list("Y" = Y, "Y_pre" = NULL, "Y_post" = NULL, "D" = D, "X" = NULL, "Z" = Z, "running_variable" = NULL, "cutoff" = NULL)
-
-  class(output) <- "causalQual"
-  return(output)
-}
-
-
-#' Causal Inference for Qualitative Outcomes under Difference-in-Differences
-#'
-#' Fit two-group/two-period models for qualitative outcomes to estimate the probabilities of shift on the treated.
-#'
-#' @param Y_pre Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
-#' @param Y_post Qualitative outcome after treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
-#' @param D Binary treatment indicator.
-#'
-#' @return An object of class \code{causalQual}.
-#'
-#' @examples
-#' ## Generate synthetic data.
-#' set.seed(1986)
-#'
-#' data <- generate_qualitative_data_did(100, assignment = "observational",
-#'                                       outcome_type = "ordered")
-#'
-#' Y_pre <- data$Y_pre
-#' Y_post <- data$Y_post
-#' D <- data$D
-#'
-#' ## Estimate probabilities of shift on the treated.
-#' fit <- causalQual_did(Y_pre, Y_post, D)
-#'
-#' summary(fit)
-#' plot(fit)
-#'
-#' @details
-#' Under a difference-in-difference design, identification requires that the probabilities time shift for \eqn{Y_{is} (0)} for class \eqn{m} evolve similarly for the treated and control groups (parallel
-#' trends on the probability mass functions of \eqn{Y_{is}(0)}). If this assumption holds, we can recover the probability of shift on the treated for class \eqn{m}:
-#'
-#' \deqn{\delta_{m, T} := P(Y_{it} (1) = m | D_i = 1) - P(Y_{it}(0) = m | D_i = 1).}
-#'
-#' \code{\link{causalQual_did}} applies, for each class \eqn{m}, the canonical two-group/two-period method to the binary variable \eqn{1(Y_{is} = m)}. Specifically,
-#' consider the following linear model:
-#'
-#' \deqn{1(Y_{is} = m) = D_i \beta_{m1} + 1(s = t) \beta_{m2} + D_i 1(s = t) \beta_{m3} + \epsilon_{mis}.}
-#'
-#' The OLS estimate \eqn{\hat{\beta}_{m3}} of \eqn{\beta_{m3}} is our estimate of the probability shift on the treated for class \code{m}. Standard errors are clustered at the unit level and used to construct
-#' conventional confidence intervals.
-#'
-#' @importFrom lmtest coeftest
-#' @importFrom sandwich vcovCL
-#' @importFrom stats lm
-#' @importFrom stats as.formula pnorm
-#'
-#' @author Riccardo Di Francesco
-#'
-#' @seealso \code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_rd}}
-#'
-#' @references
-#' \itemize{
-#'   \item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
-#' }
-#'
-#' @export
-causalQual_did <- function(Y_pre, Y_post, D) {
-  ## 0.) Handle inputs and checks.
-  if (!all(sort(unique(Y_pre)) == seq_len(max(Y_pre)))) stop("Invalid 'Y_pre'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
-  if (!all(sort(unique(Y_post)) == seq_len(max(Y_post)))) stop("Invalid 'Y_post'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
-  if (is.null(Y_pre) | is.null(Y_post)) stop("When 'identification' is 'diff_in_diff', we need both 'Y_pre' and 'Y_post'.", call. = FALSE)
-
-  classes_pre <- sort(unique(Y_pre))
-  classes_post <- sort(unique(Y_post))
-
-  if (any(sort(unique(classes_pre) != sort(unique(classes_post))))) stop("'Y_pre' and 'Y_post' have different classes.", call. = FALSE)
-  classes <- classes_pre
-
-  Y <- c(Y_pre, Y_post)
-  D_new <- c(rep(D, 2))
-  time <- c(rep(0, length(Y_pre)), rep(1, length(Y_pre)))
-  unit_id <- rep(seq_len(length(Y_pre)), 2)
-
-  data <- data.frame("Y" = Y, "D" = D_new, "time" = time, "unit_id" = unit_id)
-
-  ## 1.) Fit models. Then construct conventional confidence intervals.
-  fits <- list()
-  pshifts_treated_hat <- numeric()
-  pshifts_treated_hat_se <- numeric()
-
-  for (m in classes) {
-    data$indicator <- as.numeric(Y == m)
-    fit <- stats::lm(indicator ~ D*time, data = data)
-    cluster_se <- lmtest::coeftest(fit, vcov = sandwich::vcovCL(fit, cluster = ~ unit_id, type = "HC0"))
-
-    fits[[paste0("Class_", m)]] <- fit
-    pshifts_treated_hat[m] <- coef(fit)["D:time"]
-    pshifts_treated_hat_se[m] <- cluster_se["D:time", 2]
-  }
-
-  cis_lower <- pshifts_treated_hat - 1.96 * pshifts_treated_hat_se
-  cis_upper <- pshifts_treated_hat + 1.96 * pshifts_treated_hat_se
-
-  ## 2.) Output.
-  output <- list()
-  output$identification <- "diff_in_diff"
-  output$outcome_type <- NULL
-  output$estimates <- pshifts_treated_hat
-  output$standard_errors <- pshifts_treated_hat_se
-  output$confidence_intervals <- list("lower" = cis_lower, "upper" = cis_upper)
-  output$dr_scores <- NULL
-  output$fits <- fits
-  output$data <- list("Y" = NULL, "Y_pre" = Y_pre, "Y_post" = Y_post, "D" = D, "X" = NULL, "Z" = NULL, "running_variable" = NULL, "cutoff" = NULL)
+  output$data <- list("Y" = Y, "D" = D, "unit_id" = NULL, "time" = NULL, "X" = NULL, "Z" = Z, "running_variable" = NULL, "cutoff" = NULL)
 
   class(output) <- "causalQual"
   return(output)
@@ -385,8 +272,6 @@ causalQual_did <- function(Y_pre, Y_post, D) {
 
 
 #' Causal Inference for Qualitative Outcomes under Regression Discontinuity
-#'
-#' Fit local polynomial regression models for qualitative outcomes to estimate the probabilities of shift at the cutoff.
 #'
 #' @param Y Qualitative outcome. Must be labeled as \eqn{\{1, 2, \dots\}}.
 #' @param running_variable Running variable determining treatment assignment.
@@ -441,10 +326,10 @@ causalQual_rd <- function(Y, running_variable, cutoff) {
 
   ## 1.) Fit models.
   fits <- list()
-  pshifts_cutoff_hat <- numeric()
-  pshifts_cutoff_hat_se <- numeric()
-  pshifts_cutoff_hat_ci_lower <- numeric()
-  pshifts_cutoff_hat_ci_upper <- numeric()
+  pshifts_cutoff_hat <- numeric(length(classes))
+  pshifts_cutoff_hat_se <- numeric(length(classes))
+  pshifts_cutoff_hat_ci_lower <- numeric(length(classes))
+  pshifts_cutoff_hat_ci_upper <- numeric(length(classes))
 
   for (m in classes) {
     indicator <- as.numeric(Y == m)
@@ -466,8 +351,175 @@ causalQual_rd <- function(Y, running_variable, cutoff) {
   output$confidence_intervals <- list("lower" = pshifts_cutoff_hat_ci_lower, "upper" = pshifts_cutoff_hat_ci_upper)
   output$dr_scores <- NULL
   output$fits <- fits
-  output$data <- list("Y" = Y, "Y_pre" = NULL, "Y_post" = NULL, "D" = NULL, "X" = NULL, "Z" = NULL, "running_variable" = running_variable, "cutoff" = cutoff)
+  output$data <- list("Y" = Y, "D" = NULL, "unit_id" = NULL, "time" = NULL, "X" = NULL, "Z" = NULL, "running_variable" = running_variable, "cutoff" = cutoff)
 
   class(output) <- "causalQual"
   return(output)
 }
+
+
+#' Causal Inference for Qualitative Outcomes under Difference-in-Differences
+#'
+#' @param Y Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.
+#' @param D Binary treatment indicator.
+#' @param treatment_start Denots at which \code{time} treatment starts. Must be zero for never-treated.
+#' @param unit_id Unit identifier.
+#' @param time Time identifier.
+#' @param ... Other arguments for the \code{\link[did]{att_gt}} function.
+#'
+#' @return An object of class \code{causalQual}.
+#'
+#' @examples
+#' ## Generate synthetic data.
+#' set.seed(1986)
+#'
+#' data <- generate_qualitative_data_did(100, assignment = "observational",
+#'                                       outcome_type = "ordered")
+#'
+#' Y <- data$Y
+#' D <- data$D
+#' unit_id <- data$unit_id
+#' time <- data$time
+#'
+#' ## Estimate probabilities of shift on the treated.
+#' fit <- causalQual_did(Y, D, unit_id, time)
+#'
+#' summary(fit)
+#' plot(fit)
+#'
+#' @details
+#' Under a difference-in-difference design, identification requires that the probabilities time shift for \eqn{Y_{is} (0)} for class \eqn{m} evolve similarly for the treated and control groups (parallel
+#' trends on the probability mass functions of \eqn{Y_{is}(0)}). If this assumption holds, we can recover the probability of shift on the treated for class \eqn{m}:
+#'
+#' \deqn{\delta_{m, T} := P(Y_{it} (1) = m | D_i = 1) - P(Y_{it}(0) = m | D_i = 1).}
+#'
+#' \code{\link{causalQual_did}} applies, for each class \eqn{m}, the canonical two-group/two-period method to the binary variable \eqn{1(Y_{is} = m)}. Specifically,
+#' consider the following linear model:
+#'
+#' \deqn{1(Y_{is} = m) = D_i \beta_{m1} + 1(s = t) \beta_{m2} + D_i 1(s = t) \beta_{m3} + \epsilon_{mis}.}
+#'
+#' The OLS estimate \eqn{\hat{\beta}_{m3}} of \eqn{\beta_{m3}} is our estimate of the probability shift on the treated for class \code{m}. Standard errors are clustered at the unit level and used to construct
+#' conventional confidence intervals.
+#'
+#' @import did
+#' @importFrom lmtest coeftest
+#' @importFrom sandwich vcovCL
+#' @importFrom stats lm
+#' @importFrom stats as.formula pnorm
+#'
+#' @author Riccardo Di Francesco
+#'
+#' @seealso \code{\link{causalQual_soo}} \code{\link{causalQual_iv}} \code{\link{causalQual_rd}}
+#'
+#' @references
+#' \itemize{
+#'   \item Di Francesco, R., and Mellace, G. (2025). Causal Inference for Qualitative Outcomes. arXiv preprint arXiv:2502.11691. \doi{10.48550/arXiv.2502.11691}.
+#' }
+#'
+#' @export
+causalQual_did <- function(Y, D, unit_id, time) {
+  ## 0.) Handle inputs and checks.
+  if (!all(sort(unique(Y)) == seq_len(max(Y)))) stop("Invalid 'Y'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
+  if (length(unique(time)) < 2) stop("We need at least two time periods (i.e., two unique values of 'time').", call. = FALSE)
+
+  classes <- sort(unique(Y))
+  data <- data.frame(Y = Y, D = D, id = unit_id, time = time, treatment_start = treatment_start)
+
+  ## 1.) Fit models. Then construct conventional confidence intervals.
+  fits <- list()
+  pshifts_treated_hat <- numeric(length(classes))
+  pshifts_treated_hat_se <- numeric(length(classes))
+
+  for (m in classes) {
+    data$indicator <- as.numeric(Y == m)
+    fit <- stats::lm(indicator ~ D*time, data = data)
+    cluster_se <- lmtest::coeftest(fit, vcov = sandwich::vcovCL(fit, cluster = ~ unit_id, type = "HC0"))
+
+    fits[[paste0("Class_", m)]] <- fit
+    pshifts_treated_hat[m] <- coef(fit)["D:time"]
+    pshifts_treated_hat_se[m] <- cluster_se["D:time", 2]
+  }
+
+  cis_lower <- pshifts_treated_hat - 1.96 * pshifts_treated_hat_se
+  cis_upper <- pshifts_treated_hat + 1.96 * pshifts_treated_hat_se
+
+  ## 2.) Output.
+  output <- list()
+  output$identification <- "diff_in_diff"
+  output$outcome_type <- NULL
+  output$estimates <- pshifts_treated_hat
+  output$standard_errors <- pshifts_treated_hat_se
+  output$confidence_intervals <- list("lower" = cis_lower, "upper" = cis_upper)
+  output$dr_scores <- NULL
+  output$fits <- fits
+  output$data <- list("Y" = Y, "D" = D, "unit_id" = unit_id, "time" = time, "X" = NULL, "Z" = NULL, "running_variable" = NULL, "cutoff" = NULL)
+
+  class(output) <- "causalQual"
+  return(output)
+}
+# causalQual_did <- function(Y, D, unit_id, time, treatment_start, estimator = "CS", ...) {
+#   ## 0.) Handle inputs and checks.
+#   if (!all(sort(unique(Y)) == seq_len(max(Y)))) stop("Invalid 'Y'. Outcome must be coded with consecutive integers from 1 to max(Y).", call. = FALSE)
+#   if (!(estimator %in% c("TGTP", "CS"))) stop("Invalid 'estimator'. Must be either 'TGTP' (two-group/two-period) or CS (Callaway & Sant'Anna, 2021).", call. = FALSE)
+#   if (length(unique(time)) < 2) stop("We need at least two time periods (i.e., two unique values of 'time').", call. = FALSE)
+#   if (length(unique(time)) & estimator == "TGTP") stop("The 'TGTP' (two-group/two-period) estimator can be employed only if we have just two time periods.", call. = FALSE)
+#
+#   classes <- sort(unique(Y))
+#   data <- data.frame(Y = Y, D = D, id = unit_id, time = time, treatment_start = treatment_start)
+#
+#   ## 1.) Estimation. Implement the chosen estimator.
+#   if (estimator == "TGTP") {
+#     ## Fit models. Then construct conventional confidence intervals.
+#     fits <- list()
+#     pshifts_treated_hat <- numeric(length(classes))
+#     pshifts_treated_hat_se <- numeric(length(classes))
+#
+#     for (m in classes) {
+#       data$indicator <- as.numeric(Y == m)
+#       fit <- stats::lm(indicator ~ D*time, data = data)
+#       cluster_se <- lmtest::coeftest(fit, vcov = sandwich::vcovCL(fit, cluster = ~ unit_id, type = "HC0"))
+#
+#       fits[[paste0("Class_", m)]] <- fit
+#       pshifts_treated_hat[m] <- coef(fit)["D:time"]
+#       pshifts_treated_hat_se[m] <- cluster_se["D:time", 2]
+#     }
+#
+#     cis_lower <- pshifts_treated_hat - 1.96 * pshifts_treated_hat_se
+#     cis_upper <- pshifts_treated_hat + 1.96 * pshifts_treated_hat_se
+#   } else if (estimator == "CS") {
+#     fits <- list()
+#     pshifts_treated_hat <- numeric(length(classes))
+#     pshifts_treated_hat_se <- numeric(length(classes))
+#
+#     for (m in classes) {
+#       data$indicator <- as.numeric(Y == m)
+#
+#       fit <- did::att_gt(yname = "indicator",
+#                          tname = "time",
+#                          idname = "id",
+#                          gname = "treatment_start",
+#                          data = data,
+#                          ...)
+#
+#       fits[[paste0("Class_", m)]] <- fit
+#       # pshifts_treated_hat[m] <- summary_attgt$overall.att
+#       # pshifts_treated_hat_se[m] <- summary_attgt$overall.se
+#     }
+#   }
+#
+#
+#
+#   ## 2.) Output.
+#   output <- list()
+#   output$identification <- "diff_in_diff"
+#   output$outcome_type <- NULL
+#   output$estimates <- pshifts_treated_hat
+#   output$standard_errors <- pshifts_treated_hat_se
+#   # output$confidence_intervals <- list("lower" = cis_lower, "upper" = cis_upper)
+#   output$dr_scores <- NULL
+#   output$fits <- fits
+#   output$data <- list("Y" = Y, "D" = D, "unit_id" = unit_id, "time" = time, "X" = NULL, "Z" = NULL, "running_variable" = NULL, "cutoff" = NULL)
+#
+#   class(output) <- "causalQual"
+#   return(output)
+# }

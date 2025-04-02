@@ -21,7 +21,7 @@ causalQual_soo(Y, D, X, outcome_type, K = 5)
 An object of class \code{causalQual}.
 }
 \description{
-Construct and average doubly robust scores for qualitative outcomes to estimate the probabilities of shift.
+Causal Inference for Qualitative Outcomes under Selection-on-Observables
 }
 \details{
 Under a selection-on-observables design, identification requires the treatment indicator to be (conditionally) independent of potential outcomes

@@ -17,7 +17,7 @@ causalQual_rd(Y, running_variable, cutoff)
 An object of class \code{causalQual}.
 }
 \description{
-Fit local polynomial regression models for qualitative outcomes to estimate the probabilities of shift at the cutoff.
+Causal Inference for Qualitative Outcomes under Regression Discontinuity
 }
 \details{
 Under a regression discontinuity design, identification requires that the probability mass functions for class \eqn{m} of potential outcomes are continuous in the running variable (continuity). If this assumption holds,

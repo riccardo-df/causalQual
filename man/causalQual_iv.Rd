@@ -17,7 +17,7 @@ causalQual_iv(Y, D, Z)
 An object of class \code{causalQual}.
 }
 \description{
-Fit two-stage least squares models for qualitative outcomes to estimate the local probabilities of shift.
+Causal Inference for Qualitative Outcomes under Instrumental Variables
 }
 \details{
 Under an instrumental-variables design, identification requires the instrument to be independent of potential outcomes and potential treatments (exogeneity), that the

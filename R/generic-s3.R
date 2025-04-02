@@ -50,7 +50,7 @@ summary.causalQual <- function(object, ...) {
   cat("Identification:         ", identification, "\n")
   cat("Estimand:               ", estimand, "\n")
   cat("Outcome type:           ", object$outcome_type, "\n")
-  cat("Classes:                ", if (object$identification == "diff_in_diff") sort(unique(object$data$Y_pre)) else sort(unique(object$data$Y)), "\n")
+  cat("Classes:                ", sort(unique(object$data$Y)), "\n")
   cat("N. units:               ", length(object$data$D), "\n")
   cat("Fraction treated units: ", mean(object$data$D), "\n\n")
   cat("")

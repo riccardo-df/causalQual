@@ -4,20 +4,26 @@
 \alias{causalQual_did}
 \title{Causal Inference for Qualitative Outcomes under Difference-in-Differences}
 \usage{
-causalQual_did(Y_pre, Y_post, D)
+causalQual_did(Y, D, unit_id, time, treatment_start, estimator = "CS")
 }
 \arguments{
-\item{Y_pre}{Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.}
-
-\item{Y_post}{Qualitative outcome after treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.}
+\item{Y}{Qualitative outcome before treatment. Must be labeled as \eqn{\{1, 2, \dots\}}.}
 
 \item{D}{Binary treatment indicator.}
+
+\item{unit_id}{Unit identifier.}
+
+\item{time}{Time identifier.}
+
+\item{treatment_start}{Denots at which \code{time} treatment starts. Must be zero for never-treated.}
+
+\item{...}{Other arguments for the \code{\link[did]{att_gt}} function.}
 }
 \value{
 An object of class \code{causalQual}.
 }
 \description{
-Fit two-group/two-period models for qualitative outcomes to estimate the probabilities of shift on the treated.
+Causal Inference for Qualitative Outcomes under Difference-in-Differences
 }
 \details{
 Under a difference-in-difference design, identification requires that the probabilities time shift for \eqn{Y_{is} (0)} for class \eqn{m} evolve similarly for the treated and control groups (parallel
@@ -40,12 +46,13 @@ set.seed(1986)
 data <- generate_qualitative_data_did(100, assignment = "observational",
                                       outcome_type = "ordered")
 
-Y_pre <- data$Y_pre
-Y_post <- data$Y_post
+Y <- data$Y
 D <- data$D
+unit_id <- data$unit_id
+time <- data$time
 
 ## Estimate probabilities of shift on the treated.
-fit <- causalQual_did(Y_pre, Y_post, D)
+fit <- causalQual_did(Y, D, unit_id, time)
 
 summary(fit)
 plot(fit)
